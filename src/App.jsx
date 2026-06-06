@@ -5,12 +5,13 @@ import {
   MapPin, Phone, Mail, FileText, Activity, Users, Video, Calendar,
   ChevronDown, ChevronUp, Quote, GraduationCap, Heart, Clock, BookOpen
 } from 'lucide-react';
+import Dashboard from './components/Dashboard';
 
 const departments = [
   "Special Education", "Speech-Language Therapy", "Occupational Therapy"
 ];
 
-const professionals = [
+const fallbackProfessionals = [
   { name: "Dr. Priya Nair", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Chennai", rating: 4.9 },
   { name: "Ms. Kavitha Ramachandran", dept: "Special Education", qual: "M.Ed. Special Education", city: "Bangalore", rating: 5.0 },
   { name: "Ms. Deepa Krishnamurthy", dept: "Occupational Therapy", qual: "BOT", city: "Hyderabad", rating: 4.7 },
@@ -85,6 +86,9 @@ export default function App() {
   const [selectedGoals, setSelectedGoals] = useState([]);
   const [generatedDocument, setGeneratedDocument] = useState(null);
   const [mchatAnswers, setMchatAnswers] = useState(Array(20).fill(null));
+  
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [professionalsList, setProfessionalsList] = useState(fallbackProfessionals);
 
   // Supabase Auth State
   const [session, setSession] = useState(null);
@@ -109,6 +113,16 @@ export default function App() {
       if (session) fetchProfile(session.user.id);
       else setUserProfile(null);
     });
+
+    const fetchDynamicProfessionals = async () => {
+      const { data } = await supabase.from('profiles').select('*').eq('role', 'Professional').eq('is_approved', true);
+      if (data && data.length > 0) {
+        setProfessionalsList([...fallbackProfessionals, ...data.map(p => ({
+          name: p.full_name, dept: p.dept, qual: p.qual, city: p.city
+        }))]);
+      }
+    };
+    fetchDynamicProfessionals();
 
     return () => subscription.unsubscribe();
   }, []);
@@ -336,6 +350,10 @@ export default function App() {
     </a>
   );
 
+  if (showDashboard) {
+    return <Dashboard session={session} userProfile={userProfile} supabase={supabase} onClose={() => setShowDashboard(false)} />;
+  }
+
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-darkBg text-darkText' : 'bg-white text-lightText'}`}>
       {/* 1. NAVBAR */}
@@ -361,6 +379,7 @@ export default function App() {
               {session ? (
                 <div className="flex items-center gap-4">
                   <span className="font-medium text-primary hidden lg:inline-block">Hi, {userProfile?.full_name?.split(' ')[0] || 'User'}</span>
+                  <button onClick={() => setShowDashboard(true)} className="font-bold text-primary hover:underline hidden sm:block">Dashboard</button>
                   <button onClick={handleLogout} className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-full font-medium transition-all">
                     Log out
                   </button>
@@ -676,8 +695,8 @@ export default function App() {
                   <label className="text-sm font-semibold">Select Professional *</label>
                   <select name="professional" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50" disabled={!bookingDept}>
                     <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{bookingDept ? "Select Expert" : "Select Department First"}</option>
-                    {professionals.filter(p => p.dept === bookingDept).map(p => (
-                      <option key={p.name} value={p.name} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{p.name} - {p.city}</option>
+                    {professionalsList.filter(p => p.dept === bookingDept).map(p => (
+                      <option key={p.name} value={p.name} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{p.name} - {p.city || 'Remote'}</option>
                     ))}
                   </select>
                 </div>
