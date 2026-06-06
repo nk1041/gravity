@@ -77,6 +77,7 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [bookingDept, setBookingDept] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [activeTool, setActiveTool] = useState(null);
@@ -283,11 +284,50 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleBookingSubmit = (e) => {
+  const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    setBookingSuccess(true);
-    setTimeout(() => setBookingSuccess(false), 5000);
-    e.target.reset();
+    setBookingLoading(true);
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Save to Supabase
+    const { error } = await supabase.from('bookings').insert([{
+      parent_name: data.parent_name,
+      email: data.email,
+      phone: data.phone,
+      child_age: data.child_age,
+      condition: data.condition,
+      department: data.department,
+      professional: data.professional,
+      booking_date: data.booking_date,
+      booking_time: data.booking_time,
+      session_mode: data.mode,
+      notes: data.notes
+    }]);
+
+    if (!error) {
+      // Submit to Web3Forms to send email to nkdrop23@gmail.com
+      try {
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: "YOUR_WEB3FORMS_ACCESS_KEY_HERE",
+            subject: `New Booking Lead from ${data.parent_name}`,
+            ...data
+          })
+        });
+      } catch (err) {
+        console.error("Email send failed", err);
+      }
+      
+      setBookingSuccess(true);
+      setTimeout(() => setBookingSuccess(false), 5000);
+      e.target.reset();
+    } else {
+      alert("Failed to submit booking: " + error.message);
+    }
+    setBookingLoading(false);
   };
 
   const NavLink = ({ href, children }) => (
@@ -594,24 +634,24 @@ export default function App() {
               <form onSubmit={handleBookingSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Parent / Guardian Name *</label>
-                  <input required type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="John Doe" />
+                  <input required name="parent_name" type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="John Doe" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Email Address *</label>
-                  <input required type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="john@example.com" />
+                  <input required name="email" type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="john@example.com" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Phone Number *</label>
-                  <input required type="tel" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="+91 XXXXX XXXXX" />
+                  <input required name="phone" type="tel" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="+91 XXXXX XXXXX" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Child's Age *</label>
-                  <input required type="number" min="0" max="25" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. 5" />
+                  <input required name="child_age" type="number" min="0" max="25" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. 5" />
                 </div>
                 
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-semibold">Primary Concern / Condition *</label>
-                  <select required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                  <select name="condition" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
                     <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Condition</option>
                     <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
                     <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
@@ -626,7 +666,7 @@ export default function App() {
 
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Department *</label>
-                  <select required value={bookingDept} onChange={(e) => setBookingDept(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                  <select name="department" required value={bookingDept} onChange={(e) => setBookingDept(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
                     <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Department</option>
                     {departments.map(d => <option key={d} value={d} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{d}</option>)}
                   </select>
@@ -634,7 +674,7 @@ export default function App() {
 
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Select Professional *</label>
-                  <select required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50" disabled={!bookingDept}>
+                  <select name="professional" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50" disabled={!bookingDept}>
                     <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{bookingDept ? "Select Expert" : "Select Department First"}</option>
                     {professionals.filter(p => p.dept === bookingDept).map(p => (
                       <option key={p.name} value={p.name} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{p.name} - {p.city}</option>
@@ -644,12 +684,12 @@ export default function App() {
 
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Preferred Date *</label>
-                  <input required type="date" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
+                  <input required name="booking_date" type="date" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-sm font-semibold">Preferred Time *</label>
-                  <select required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                  <select name="booking_time" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
                     <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Time Slot</option>
                     <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Morning (9 AM - 12 PM)</option>
                     <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Afternoon (12 PM - 3 PM)</option>
@@ -667,12 +707,12 @@ export default function App() {
 
                 <div className="space-y-1 md:col-span-2">
                   <label className="text-sm font-semibold">Additional Notes (Optional)</label>
-                  <textarea rows="3" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Briefly describe any specific requirements..."></textarea>
+                  <textarea name="notes" rows="3" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Briefly describe any specific requirements..."></textarea>
                 </div>
 
                 <div className="md:col-span-2 pt-4">
-                  <button type="submit" className="w-full bg-primary hover:bg-purple-700 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-primary/30 btn-animated">
-                    Confirm Appointment
+                  <button disabled={bookingLoading} type="submit" className="w-full bg-primary hover:bg-purple-700 disabled:opacity-50 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-primary/30 btn-animated">
+                    {bookingLoading ? 'Processing...' : 'Confirm Appointment'}
                   </button>
                 </div>
               </form>
