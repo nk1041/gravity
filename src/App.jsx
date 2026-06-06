@@ -7,29 +7,16 @@ import {
 } from 'lucide-react';
 
 const departments = [
-  "Special Education", "Speech-Language Therapy", "Occupational Therapy", 
-  "Applied Behavior Analysis (ABA)", "Child Psychology & Counseling", 
-  "Developmental Pediatrics", "Physiotherapy", "Sensory Integration Therapy", 
-  "Learning Disabilities Support", "Autism Spectrum Support", 
-  "Down Syndrome Support", "ADHD Coaching"
+  "Special Education", "Speech-Language Therapy", "Occupational Therapy"
 ];
 
 const professionals = [
   { name: "Dr. Priya Nair", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Chennai", rating: 4.9 },
-  { name: "Dr. Arjun Mehta", dept: "Developmental Pediatrics", qual: "MD Pediatrics", city: "Mumbai", rating: 4.8 },
   { name: "Ms. Kavitha Ramachandran", dept: "Special Education", qual: "M.Ed. Special Education", city: "Bangalore", rating: 5.0 },
-  { name: "Dr. Sunita Sharma", dept: "Child Psychology & Counseling", qual: "Ph.D. Psychology", city: "Delhi", rating: 4.9 },
   { name: "Ms. Deepa Krishnamurthy", dept: "Occupational Therapy", qual: "BOT", city: "Hyderabad", rating: 4.7 },
-  { name: "Mr. Rohit Verma", dept: "Applied Behavior Analysis (ABA)", qual: "BCBA", city: "Pune", rating: 4.8 },
-  { name: "Dr. Ananya Bose", dept: "Physiotherapy", qual: "MPT Pediatrics", city: "Kolkata", rating: 4.9 },
-  { name: "Ms. Meena Pillai", dept: "Sensory Integration Therapy", qual: "OT (SI)", city: "Kochi", rating: 4.8 },
-  { name: "Dr. Rajeev Kulkarni", dept: "Autism Spectrum Support", qual: "M.Ed. Special Education", city: "Pune", rating: 5.0 },
-  { name: "Ms. Shreya Iyer", dept: "ADHD Coaching", qual: "Certified ADHD Coach", city: "Bangalore", rating: 4.7 },
-  { name: "Mr. Vikram Nambiar", dept: "Learning Disabilities Support", qual: "M.A. Spl Ed", city: "Chennai", rating: 4.8 },
-  { name: "Dr. Pooja Agarwal", dept: "Child Psychology & Counseling", qual: "MD Psychiatry", city: "Delhi", rating: 4.9 },
-  { name: "Ms. Lakshmi Venkatesh", dept: "Down Syndrome Support", qual: "M.Ed. Special Education", city: "Hyderabad", rating: 4.9 },
-  { name: "Dr. Suresh Menon", dept: "Developmental Pediatrics", qual: "MD Pediatrics", city: "Mumbai", rating: 4.8 },
-  { name: "Ms. Neha Joshi", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Jaipur", rating: 4.7 }
+  { name: "Ms. Neha Joshi", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Jaipur", rating: 4.7 },
+  { name: "Mr. Rajeev Kulkarni", dept: "Special Education", qual: "M.Ed. Special Education", city: "Pune", rating: 5.0 },
+  { name: "Ms. Meena Pillai", dept: "Occupational Therapy", qual: "OT (SI)", city: "Kochi", rating: 4.8 }
 ];
 
 const testimonials = [
@@ -58,6 +45,29 @@ const toolGoals = [
   "Reading Comprehension", "Self-Feeding", "Task Focus", "Transitions"
 ];
 
+const mchatQuestions = [
+  "1. If you point at something across the room, does your child look at it?",
+  "2. Have you ever wondered if your child might be deaf?",
+  "3. Does your child play pretend or make-believe?",
+  "4. Does your child like climbing on things?",
+  "5. Does your child make unusual finger movements near his or her eyes?",
+  "6. Does your child point with one finger to ask for something or to get help?",
+  "7. Does your child point with one finger to show you something interesting?",
+  "8. Is your child interested in other children?",
+  "9. Does your child show you things by bringing them to you or holding them up for you to see?",
+  "10. Does your child respond when you call his or her name?",
+  "11. When you smile at your child, does he or she smile back at you?",
+  "12. Does your child get upset by everyday noises?",
+  "13. Does your child walk?",
+  "14. Does your child look you in the eye when you are talking, playing, or dressing?",
+  "15. Does your child try to copy what you do?",
+  "16. If you turn your head to look at something, does your child look around to see what you are looking at?",
+  "17. Does your child try to get you to watch him or her?",
+  "18. Does your child understand when you tell him or her to do something?",
+  "19. If something new happens, does your child look at your face to see how you feel about it?",
+  "20. Does your child like movement activities?"
+];
+
 export default function App() {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark' || false;
@@ -73,6 +83,7 @@ export default function App() {
   const [showSignup, setShowSignup] = useState(false);
   const [selectedGoals, setSelectedGoals] = useState([]);
   const [generatedDocument, setGeneratedDocument] = useState(null);
+  const [mchatAnswers, setMchatAnswers] = useState(Array(20).fill(null));
 
   // Supabase Auth State
   const [session, setSession] = useState(null);
@@ -144,36 +155,87 @@ export default function App() {
       return;
     }
 
-    const docContent = `
-      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
-        <h1 style="color: #7C3AED; border-bottom: 2px solid #7C3AED; padding-bottom: 10px;">${activeTool} Document</h1>
-        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-        <p><strong>Prepared By:</strong> ${userProfile?.full_name || 'Educator'}</p>
-        <hr style="margin: 20px 0; border: 1px solid #eee;" />
-        
-        <h3 style="color: #4c1d95;">Primary Focus Areas</h3>
-        <ul style="line-height: 1.6;">
-          ${selectedGoals.length > 0 ? selectedGoals.map(g => `<li>${g}</li>`).join('') : '<li>General Assessment</li>'}
-        </ul>
-        
-        <h3 style="color: #4c1d95; margin-top: 30px;">AI-Generated Action Plan</h3>
-        <p style="line-height: 1.6;">Based on the selected focus areas, the following tailored interventions are recommended. This plan includes specific benchmarks for progress monitoring and suggested sensory and behavioral regulation strategies tailored for the individual needs.</p>
-        
-        <div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #7C3AED; margin-top: 20px;">
-          <strong>Next Steps:</strong> Review this document with the support team and update benchmarks monthly.
+    let docContent = '';
+    
+    if (activeTool === 'M-CHAT Assessment') {
+      if (mchatAnswers.includes(null)) {
+        alert("Please answer all 20 questions before generating the report.");
+        return;
+      }
+      let riskScore = 0;
+      mchatAnswers.forEach((ans, idx) => {
+        const isReverse = [1, 4, 11].includes(idx); // 0-indexed for questions 2, 5, 12
+        if ((isReverse && ans === 'Yes') || (!isReverse && ans === 'No')) riskScore++;
+      });
+      
+      let riskLevel = "Low Risk"; let color = "green";
+      let rec = "If child is under 24 months, screen again after 2nd birthday. No further action needed right now.";
+      if (riskScore >= 3 && riskScore <= 7) {
+        riskLevel = "Medium Risk"; color = "orange";
+        rec = "Administer Follow-Up interview. If score remains 2 or higher, refer for diagnostic evaluation.";
+      } else if (riskScore >= 8) {
+        riskLevel = "High Risk"; color = "red";
+        rec = "Bypass Follow-Up and refer immediately for diagnostic evaluation and early intervention.";
+      }
+
+      docContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+          <h1 style="color: #2563EB; border-bottom: 2px solid #2563EB; padding-bottom: 10px;">M-CHAT-R Screening Report</h1>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          <hr style="margin: 20px 0; border: 1px solid #eee;" />
+          
+          <div style="background-color: #f8fafc; padding: 20px; border-left: 5px solid ${color}; margin: 20px 0;">
+            <h2 style="color: ${color}; margin-top: 0;">Total Score: ${riskScore} / 20 (${riskLevel})</h2>
+            <p><strong>Recommendation:</strong> ${rec}</p>
+          </div>
+
+          <h3 style="color: #1e40af; margin-top: 30px;">Detailed Responses</h3>
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <tr style="background-color: #f1f5f9;">
+              <th style="padding: 10px; border: 1px solid #ddd;">Question</th>
+              <th style="padding: 10px; border: 1px solid #ddd; width: 100px;">Response</th>
+            </tr>
+            ${mchatQuestions.map((q, i) => `
+              <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">${q}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: ${((i===1||i===4||i===11)?(mchatAnswers[i]==='Yes'):(mchatAnswers[i]==='No')) ? 'red' : 'green'}">${mchatAnswers[i]}</td>
+              </tr>
+            `).join('')}
+          </table>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      docContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+          <h1 style="color: #7C3AED; border-bottom: 2px solid #7C3AED; padding-bottom: 10px;">${activeTool} Document</h1>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Prepared By:</strong> ${userProfile?.full_name || 'Educator'}</p>
+          <hr style="margin: 20px 0; border: 1px solid #eee;" />
+          
+          <h3 style="color: #4c1d95;">Primary Focus Areas</h3>
+          <ul style="line-height: 1.6;">
+            ${selectedGoals.length > 0 ? selectedGoals.map(g => `<li>${g}</li>`).join('') : '<li>General Assessment</li>'}
+          </ul>
+          
+          <h3 style="color: #4c1d95; margin-top: 30px;">AI-Generated Action Plan</h3>
+          <p style="line-height: 1.6;">Based on the selected focus areas, the following tailored interventions are recommended. This plan includes specific benchmarks for progress monitoring and suggested sensory and behavioral regulation strategies tailored for the individual needs.</p>
+          
+          <div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #7C3AED; margin-top: 20px;">
+            <strong>Next Steps:</strong> Review this document with the support team and update benchmarks monthly.
+          </div>
+        </div>
+      `;
+    }
 
     const { error } = await supabase.from('documents').insert([{ 
-      user_id: session.user.id, title: `${activeTool} - ${selectedGoals.join(', ')}`, 
+      user_id: session.user.id, title: `${activeTool} - ${new Date().toLocaleDateString()}`, 
       type: activeTool, content: docContent
     }]);
 
     if (!error) {
       setActiveTool(null);
       setGeneratedDocument({ title: activeTool, content: docContent });
-    } else alert('Error saving document');
+    } else alert('Error saving document: ' + error.message);
   };
 
   const toggleGoal = (goal) => {
@@ -429,14 +491,14 @@ export default function App() {
             <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {departments.map((dept, idx) => (
-              <div key={idx} className="group bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-6 rounded-2xl shadow-sm hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer">
-                <div className="bg-accent dark:bg-darkBgAlt w-12 h-12 rounded-lg flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-4">
-                  {idx % 3 === 0 ? <Brain /> : idx % 3 === 1 ? <Activity /> : <Users />}
+              <div key={idx} className="group bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer text-center">
+                <div className="bg-accent dark:bg-darkBgAlt w-16 h-16 mx-auto rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-6 shadow-sm">
+                  {idx === 0 ? <Users size={28} /> : idx === 1 ? <Activity size={28} /> : <Brain size={28} />}
                 </div>
-                <h3 className="font-bold text-lg mb-2">{dept}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Connect with certified experts providing evidence-based support in this area.</p>
+                <h3 className="font-bold text-xl mb-3">{dept}</h3>
+                <p className="text-gray-500 dark:text-gray-400">Expert, evidence-based support from verified professionals.</p>
               </div>
             ))}
           </div>
@@ -479,41 +541,54 @@ export default function App() {
         </div>
       </section>
 
-      {/* 7. EDUCATOR TOOLS */}
+      {/* 7. TOOLS */}
       <section id="tools" className="py-20 px-4 bg-white dark:bg-darkBg">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Powerful Tools for Educators & Therapists
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            Powerful Tools for Parents & Educators
             <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
           </h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-2xl shadow-lg hover:-translate-y-2 transition-transform">
-              <Activity className="h-12 w-12 text-primary mb-6" />
-              <h3 className="text-xl font-bold mb-3">Child Assessment</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">Standardized digital assessment forms, milestone tracking, and automated progress reports.</p>
-              <button onClick={() => setActiveTool('Assessment')} className="text-primary font-bold flex items-center gap-1 hover:gap-2 transition-all">Use Tool <ChevronRight size={18} /></button>
-            </div>
-            
-            <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-2xl shadow-lg hover:-translate-y-2 transition-transform">
-              <FileText className="h-12 w-12 text-primary mb-6" />
-              <h3 className="text-xl font-bold mb-3">IEP Generator</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">AI-assisted Individual Education Plan creation with smart goals, benchmarks, and timelines.</p>
-              <button onClick={() => setActiveTool('IEP')} className="text-primary font-bold flex items-center gap-1 hover:gap-2 transition-all">Use Tool <ChevronRight size={18} /></button>
-            </div>
-
-            <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-2xl shadow-lg hover:-translate-y-2 transition-transform">
-              <BookOpen className="h-12 w-12 text-primary mb-6" />
-              <h3 className="text-xl font-bold mb-3">Lesson Planner</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">Customizable, disability-specific weekly lesson plans with downloadable activity templates.</p>
-              <button onClick={() => setActiveTool('Lesson Planner')} className="text-primary font-bold flex items-center gap-1 hover:gap-2 transition-all">Use Tool <ChevronRight size={18} /></button>
+          <div className="space-y-16">
+            {/* Clinical Screening */}
+            <div>
+              <h3 className="text-2xl font-bold text-center mb-8 text-blue-800 dark:text-blue-400">Clinical Screening</h3>
+              <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-darkBgAlt dark:to-gray-900 border border-blue-100 dark:border-gray-800 p-8 md:p-12 rounded-3xl shadow-xl hover:-translate-y-2 transition-transform text-center flex flex-col items-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-10"><Activity size={200} /></div>
+                <div className="w-24 h-24 bg-white dark:bg-darkCard rounded-full flex items-center justify-center mb-6 shadow-md relative z-10">
+                  <Users className="h-12 w-12 text-blue-600" />
+                </div>
+                <h4 className="text-3xl font-extrabold mb-4 text-blue-900 dark:text-blue-300 relative z-10">M-CHAT Assessment</h4>
+                <p className="text-lg text-blue-700 dark:text-blue-500 mb-8 max-w-2xl relative z-10">The Modified Checklist for Autism in Toddlers. A globally validated developmental screening tool to identify early signs of autism. Recommended for children between 16-30 months.</p>
+                <button onClick={() => { setActiveTool('M-CHAT Assessment'); setMchatAnswers(Array(20).fill(null)); }} className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl transition-all btn-animated text-lg relative z-10">Start Full Screening</button>
+              </div>
             </div>
 
-            <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-2xl shadow-lg hover:-translate-y-2 transition-transform">
-              <GraduationCap className="h-12 w-12 text-primary mb-6" />
-              <h3 className="text-xl font-bold mb-3">ITP Generator</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">Individual Transition Plans for older students (14+) with vocational and life-skills goals.</p>
-              <button onClick={() => setActiveTool('ITP')} className="text-primary font-bold flex items-center gap-1 hover:gap-2 transition-all">Use Tool <ChevronRight size={18} /></button>
+            {/* Educator Document Generators */}
+            <div>
+              <h3 className="text-2xl font-bold text-center mb-8 text-primary">AI Document Generators</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <Activity className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">IEP Generator</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">AI-assisted Individual Education Plan creation with smart goals, benchmarks, and timelines.</p>
+                  <button onClick={() => setActiveTool('IEP Generator')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+                
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <GraduationCap className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">ITP Generator</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Individual Transition Plans for older students with vocational and life-skills goals.</p>
+                  <button onClick={() => setActiveTool('ITP Generator')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <BookOpen className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">Lesson Planner</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Customizable, disability-specific weekly lesson plans with downloadable templates.</p>
+                  <button onClick={() => setActiveTool('Lesson Planner')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -868,54 +943,86 @@ export default function App() {
               <X size={20} />
             </button>
             <div className="p-8 border-b border-gray-100 dark:border-gray-800 bg-accent/50 dark:bg-darkBgAlt/50">
-              <h3 className="text-2xl font-bold text-primary mb-2">{activeTool} Generator</h3>
-              <p className="text-gray-600 dark:text-gray-400">Fill in the details below to generate the document using AI without writing prompts.</p>
+              <h3 className="text-2xl font-bold text-primary mb-2">
+                {activeTool === 'M-CHAT Assessment' ? 'M-CHAT Screening Tool' : `${activeTool} Generator`}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {activeTool === 'M-CHAT Assessment' 
+                  ? 'Fill in the child details to begin the AI-guided M-CHAT developmental screening.'
+                  : 'Fill in the details below to generate the document using AI without writing prompts.'}
+              </p>
             </div>
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Child Name</label>
-                  <input type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Rahul" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Age / Grade</label>
-                  <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Age</option>
-                    {[3,4,5,6,7,8,9,10,11,12,13,14,15].map(a => <option key={a} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{a} Years</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-semibold">Primary Diagnosis / Need</label>
-                <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Condition</option>
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Down Syndrome</option>
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Learning Disability</option>
-                  <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Speech Delay</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold">Select Focus Areas <span className="text-xs font-normal text-primary bg-primary/10 px-2 py-0.5 rounded ml-2">Zero Prompting</span></label>
-                <div className="flex flex-wrap gap-2">
-                  {toolGoals.map(goal => (
-                    <button 
-                      key={goal}
-                      onClick={() => toggleGoal(goal)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedGoals.includes(goal) ? 'bg-primary text-white shadow-md scale-105' : 'bg-gray-100 dark:bg-darkBgAlt text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
-                    >
-                      {goal}
-                    </button>
+            <div className={`p-8 ${activeTool === 'M-CHAT Assessment' ? 'max-h-[60vh] overflow-y-auto' : ''} space-y-6`}>
+              {activeTool === 'M-CHAT Assessment' ? (
+                <div className="space-y-6">
+                  {mchatQuestions.map((question, qIdx) => (
+                    <div key={qIdx} className="bg-gray-50 dark:bg-darkBg p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <p className="font-semibold mb-3">{question}</p>
+                      <div className="flex gap-4">
+                        <button 
+                          onClick={() => { const newAns = [...mchatAnswers]; newAns[qIdx] = 'Yes'; setMchatAnswers(newAns); }}
+                          className={`flex-1 py-2 rounded-lg font-bold border-2 transition-all ${mchatAnswers[qIdx] === 'Yes' ? 'border-primary bg-primary text-white' : 'border-gray-300 text-gray-500 hover:border-primary'}`}
+                        >
+                          Yes
+                        </button>
+                        <button 
+                          onClick={() => { const newAns = [...mchatAnswers]; newAns[qIdx] = 'No'; setMchatAnswers(newAns); }}
+                          className={`flex-1 py-2 rounded-lg font-bold border-2 transition-all ${mchatAnswers[qIdx] === 'No' ? 'border-primary bg-primary text-white' : 'border-gray-300 text-gray-500 hover:border-primary'}`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold">Child Name</label>
+                      <input type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Rahul" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold">Age / Grade</label>
+                      <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
+                        <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Age</option>
+                        {[3,4,5,6,7,8,9,10,11,12,13,14,15].map(a => <option key={a} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{a} Years</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold">Primary Diagnosis / Need</label>
+                    <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Condition</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Down Syndrome</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Learning Disability</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Speech Delay</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Select Focus Areas <span className="text-xs font-normal text-primary bg-primary/10 px-2 py-0.5 rounded ml-2">Zero Prompting</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {toolGoals.map(goal => (
+                        <button 
+                          key={goal}
+                          onClick={() => toggleGoal(goal)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedGoals.includes(goal) ? 'bg-primary text-white shadow-md scale-105' : 'bg-gray-100 dark:bg-darkBgAlt text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                        >
+                          {goal}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
               <button 
                 onClick={handleGenerate}
                 className="w-full bg-primary hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 animate-pulse-glow"
               >
                 <Brain size={20} className="animate-bounce" />
-                Generate {activeTool}
+                {activeTool === 'M-CHAT Assessment' ? 'Calculate & Generate Report' : `Generate ${activeTool}`}
               </button>
             </div>
           </div>
