@@ -204,18 +204,20 @@ export default function App() {
           </div>
 
           <h3 style="color: #1e40af; margin-top: 30px;">Detailed Responses</h3>
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-            <tr style="background-color: #f1f5f9;">
-              <th style="padding: 10px; border: 1px solid #ddd;">Question</th>
-              <th style="padding: 10px; border: 1px solid #ddd; width: 100px;">Response</th>
-            </tr>
-            ${mchatQuestions.map((q, i) => `
-              <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">${q}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: ${((i===1||i===4||i===11)?(mchatAnswers[i]==='Yes'):(mchatAnswers[i]==='No')) ? 'red' : 'green'}">${mchatAnswers[i]}</td>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; min-width: 500px; border-collapse: collapse; text-align: left; font-size: 14px;">
+              <tr style="background-color: #f1f5f9;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Question</th>
+                <th style="padding: 10px; border: 1px solid #ddd; width: 100px;">Response</th>
               </tr>
-            `).join('')}
-          </table>
+              ${mchatQuestions.map((q, i) => `
+                <tr>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${q}</td>
+                  <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: ${((i===1||i===4||i===11)?(mchatAnswers[i]==='Yes'):(mchatAnswers[i]==='No')) ? 'red' : 'green'}">${mchatAnswers[i]}</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
         </div>
       `;
     } else {
@@ -368,7 +370,7 @@ export default function App() {
         
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
           <div className="space-y-8 text-center lg:text-left">
-            <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
               Empowering Every Child. <br/>
               <span className="text-primary">Connecting Every Family.</span>
             </h1>
@@ -657,7 +659,7 @@ export default function App() {
 
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-semibold">Session Mode *</label>
-                  <div className="flex gap-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Online" required className="text-primary focus:ring-primary"/> Online (Video Call)</label>
                     <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Home Session" required className="text-primary focus:ring-primary"/> Home Session</label>
                   </div>
@@ -882,7 +884,7 @@ export default function App() {
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-1">
                       <label className="text-sm font-semibold">Child Name</label>
                       <input type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Rahul" />
