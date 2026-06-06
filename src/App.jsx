@@ -296,11 +296,8 @@ export default function App() {
             <div className="hidden md:flex items-center gap-6">
               <NavLink href="#about">About</NavLink>
               <NavLink href="#services">Services</NavLink>
-              <NavLink href="#professionals">Professionals</NavLink>
               <NavLink href="#tools">Tools</NavLink>
               <NavLink href="#testimonials">Testimonials</NavLink>
-              <NavLink href="#contact">Contact</NavLink>
-              
               <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-accent dark:hover:bg-darkCard transition-colors">
                 {darkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
               </button>
@@ -343,11 +340,9 @@ export default function App() {
           <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-darkBgAlt shadow-xl border-t dark:border-gray-800 py-4 px-6 flex flex-col gap-4">
             <NavLink href="#about">About</NavLink>
             <NavLink href="#services">Services</NavLink>
-            <NavLink href="#professionals">Professionals</NavLink>
             <NavLink href="#tools">Tools</NavLink>
             <NavLink href="#booking">Booking</NavLink>
             <NavLink href="#testimonials">Testimonials</NavLink>
-            <NavLink href="#contact">Contact</NavLink>
           </div>
         )}
       </nav>
@@ -505,41 +500,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* 6. PROFESSIONALS SECTION */}
-      <section id="professionals" className="py-20 px-4 bg-accent dark:bg-darkBgAlt">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Meet Our Experts
-            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
-          </h2>
-          
-          <div className="flex overflow-x-auto pb-8 gap-6 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none' }}>
-            {professionals.map((prof, idx) => (
-              <div key={idx} className="min-w-[300px] w-[300px] bg-white dark:bg-darkCard rounded-2xl shadow-lg p-6 snap-center flex-shrink-0 border border-gray-100 dark:border-gray-800">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold shadow-md">
-                    {prof.name.split(' ').map(n => n[0]).join('').replace('D', '').replace('M', '').replace('r', '').replace('s', '').replace('.', '').trim().substring(0,2)}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">{prof.name}</h3>
-                    <div className="flex items-center text-sm text-yellow-500 font-bold">
-                      <Star className="h-4 w-4 fill-current mr-1" /> {prof.rating}
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2 mb-6">
-                  <p className="text-sm text-primary font-medium">{prof.dept}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2"><GraduationCap size={16}/> {prof.qual}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2"><MapPin size={16}/> {prof.city}</p>
-                </div>
-                <a href="#booking" onClick={() => setBookingDept(prof.dept)} className="block text-center w-full bg-accent dark:bg-darkBgAlt hover:bg-primary hover:text-white text-primary font-semibold py-2 rounded-lg transition-colors border border-primary/20">
-                  Book Appointment
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 7. TOOLS */}
       <section id="tools" className="py-20 px-4 bg-white dark:bg-darkBg">
@@ -685,7 +645,7 @@ export default function App() {
                   <label className="text-sm font-semibold">Session Mode *</label>
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Online" required className="text-primary focus:ring-primary"/> Online (Video Call)</label>
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="In-Person" required className="text-primary focus:ring-primary"/> In-Person (Clinic)</label>
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Home Session" required className="text-primary focus:ring-primary"/> Home Session</label>
                   </div>
                 </div>
 
@@ -808,74 +768,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* 12. CONTACT SECTION */}
-      <section id="contact" className="py-20 px-4 bg-accent dark:bg-darkBgAlt border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Get in Touch
-            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-12 bg-white dark:bg-darkCard rounded-3xl shadow-xl overflow-hidden">
-            <div className="p-10 bg-primary text-white">
-              <h3 className="text-2xl font-bold mb-6">Contact Information</h3>
-              <p className="mb-8 text-primary-100">Have questions about booking or using our tools? Our support team is here to help families and educators.</p>
-              
-              <div className="space-y-6 mb-12">
-                <div className="flex items-start gap-4">
-                  <MapPin className="h-6 w-6 text-white/80 shrink-0" />
-                  <div>
-                    <h4 className="font-bold">Our Office</h4>
-                    <p className="text-white/80">Level 4, Tech Park, Andheri East<br/>Mumbai, Maharashtra 400093, India</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Phone className="h-6 w-6 text-white/80 shrink-0" />
-                  <div>
-                    <h4 className="font-bold">Phone</h4>
-                    <p className="text-white/80">+91 98765 43210</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Mail className="h-6 w-6 text-white/80 shrink-0" />
-                  <div>
-                    <h4 className="font-bold">Email</h4>
-                    <p className="text-white/80">hello@simplyabled.in</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pseudo Map */}
-              <div className="w-full h-48 bg-white/10 rounded-xl border border-white/20 flex flex-col items-center justify-center relative overflow-hidden backdrop-blur-sm">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30"></div>
-                <MapPin size={40} className="text-white mb-2 animate-bounce relative z-10" />
-                <span className="font-semibold relative z-10">Mumbai Headquarters</span>
-              </div>
-            </div>
-            
-            <div className="p-10">
-              <h3 className="text-2xl font-bold mb-6">Send us a Message</h3>
-              <form onSubmit={(e) => { e.preventDefault(); alert('Message sent!'); e.target.reset(); }} className="space-y-6">
-                <div>
-                  <label className="text-sm font-semibold block mb-2">Full Name</label>
-                  <input required type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Your Name" />
-                </div>
-                <div>
-                  <label className="text-sm font-semibold block mb-2">Email Address</label>
-                  <input required type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="your@email.com" />
-                </div>
-                <div>
-                  <label className="text-sm font-semibold block mb-2">Message</label>
-                  <textarea required rows="4" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="How can we help you?"></textarea>
-                </div>
-                <button type="submit" className="w-full bg-primary hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition-all shadow-md">
-                  Send Message
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* 13. FOOTER */}
       <footer className="bg-[#110B24] text-white pt-16 pb-8 px-4 border-t-4 border-primary">
@@ -903,7 +795,6 @@ export default function App() {
               <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Home</a></li>
               <li><a href="#about" className="text-gray-400 hover:text-primary transition-colors">About Us</a></li>
               <li><a href="#services" className="text-gray-400 hover:text-primary transition-colors">Services</a></li>
-              <li><a href="#professionals" className="text-gray-400 hover:text-primary transition-colors">Professionals</a></li>
               <li><a href="#booking" className="text-gray-400 hover:text-primary transition-colors">Book Now</a></li>
             </ul>
           </div>
