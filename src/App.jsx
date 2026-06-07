@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient';
 import { 
   Menu, X, Moon, Sun, Brain, Star, ChevronRight, CheckCircle, 
   MapPin, Phone, Mail, FileText, Activity, Users, Video, Calendar,
-  ChevronDown, ChevronUp, Quote, GraduationCap, Heart, Clock, BookOpen
+  ChevronDown, ChevronUp, Quote, GraduationCap, Heart, Clock, BookOpen, Lock
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 
@@ -633,7 +633,7 @@ export default function App() {
       <section id="booking" className="py-20 px-4 bg-accent dark:bg-darkBgAlt">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-            Book an Appointment
+            Access Professionals & AI Tools
             <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
           </h2>
           
@@ -650,91 +650,23 @@ export default function App() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleBookingSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Parent / Guardian Name *</label>
-                  <input required name="parent_name" type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="John Doe" />
+              <div className="text-center py-12 relative z-10 animate-fade-in">
+                <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Lock size={48} />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Email Address *</label>
-                  <input required name="email" type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="john@example.com" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Phone Number *</label>
-                  <input required name="phone" type="tel" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="+91 XXXXX XXXXX" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Child's Age *</label>
-                  <input required name="child_age" type="number" min="0" max="25" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. 5" />
-                </div>
-                
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-sm font-semibold">Primary Concern / Condition *</label>
-                  <select name="condition" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Condition</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Down Syndrome</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Learning Disability</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Speech Delay</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Cerebral Palsy</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Behavioral Issues</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Other / Unsure</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Department *</label>
-                  <select name="department" required value={bookingDept} onChange={(e) => setBookingDept(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Department</option>
-                    {departments.map(d => <option key={d} value={d} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{d}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Select Professional *</label>
-                  <select name="professional" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50" disabled={!bookingDept}>
-                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{bookingDept ? "Select Expert" : "Select Department First"}</option>
-                    {professionalsList.filter(p => p.dept === bookingDept).map(p => (
-                      <option key={p.name} value={p.name} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{p.name} - {p.city || 'Remote'}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Preferred Date *</label>
-                  <input required name="booking_date" type="date" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-semibold">Preferred Time *</label>
-                  <select name="booking_time" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Time Slot</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Morning (9 AM - 12 PM)</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Afternoon (12 PM - 3 PM)</option>
-                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Evening (3 PM - 6 PM)</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-semibold">Session Mode *</label>
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Online" required className="text-primary focus:ring-primary"/> Online (Video Call)</label>
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Home Session" required className="text-primary focus:ring-primary"/> Home Session</label>
-                  </div>
-                </div>
-
-                <div className="space-y-1 md:col-span-2">
-                  <label className="text-sm font-semibold">Additional Notes (Optional)</label>
-                  <textarea name="notes" rows="3" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Briefly describe any specific requirements..."></textarea>
-                </div>
-
-                <div className="md:col-span-2 pt-4">
-                  <button disabled={bookingLoading} type="submit" className="w-full bg-primary hover:bg-purple-700 disabled:opacity-50 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-primary/30 btn-animated">
-                    {bookingLoading ? 'Processing...' : 'Confirm Appointment'}
+                <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Unlock Full Access</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-lg mx-auto text-lg">
+                  Sign in to our secure platform to find verified professionals near you, manage your appointments, and get exclusive access to our powerful AI tools for educators and parents.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button onClick={() => { setAuthMode('login'); setShowSignup(true); }} className="px-8 py-3 bg-primary hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary/30">
+                    Log In
+                  </button>
+                  <button onClick={() => { setAuthMode('signup'); setShowSignup(true); }} className="px-8 py-3 border-2 border-primary text-primary hover:bg-primary/5 rounded-xl font-bold transition-all">
+                    Create Free Account
                   </button>
                 </div>
-              </form>
+              </div>
             )}
           </div>
         </div>
