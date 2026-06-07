@@ -634,8 +634,8 @@ export default function App() {
 
             {/* Educator Document Generators */}
             <div>
-              <h3 className="text-2xl font-bold text-center mb-8 text-primary">AI Document Generators</h3>
-              <div className="grid md:grid-cols-3 gap-8">
+              <h3 className="text-2xl font-bold text-center mb-8 text-primary">AI Tools & Document Generators</h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
                   <Activity className="h-12 w-12 text-primary mb-6" />
                   <h4 className="text-xl font-bold mb-3">IEP Generator</h4>
@@ -655,6 +655,20 @@ export default function App() {
                   <h4 className="text-xl font-bold mb-3">Lesson Planner</h4>
                   <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Customizable, disability-specific weekly lesson plans with downloadable templates.</p>
                   <button onClick={() => setActiveTool('Lesson Planner')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <Brain className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">BIP Generator</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">AI-powered Behavior Intervention Plans with positive support strategies and ABC data analysis.</p>
+                  <button onClick={() => setActiveTool('BIP Generator')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <CheckCircle className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">Task Analysis Tool</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Break down complex life skills into granular, step-by-step visual checklists for students.</p>
+                  <button onClick={() => setActiveTool('Task Analysis Tool')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
                 </div>
               </div>
             </div>

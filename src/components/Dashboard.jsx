@@ -4,7 +4,7 @@ import {
   Menu, Search, Moon, Sun, ChevronLeft, ChevronRight, CheckCircle, Clock, 
   X, Upload, Plus, Download, Edit, Star, MapPin, Video, User, Lock, Eye, 
   EyeOff, Shield, Trash2, ArrowRight, Activity, BookOpen, CheckSquare, 
-  Filter, MoreVertical, Paperclip, Send, Folder, FileCheck, Check
+  Filter, MoreVertical, Paperclip, Send, Folder, FileCheck, Check, Brain
 } from 'lucide-react';
 
 // --- MOCK DATA ---
@@ -543,6 +543,8 @@ const EducatorTools = () => {
     { title: "IEP Generator", desc: "AI-assisted Individualized Education Program creation.", icon: FileCheck, color: "text-purple-500", bg: "bg-purple-100" },
     { title: "ITP Generator", desc: "Transition planning tools for students 14+.", icon: ArrowRight, color: "text-orange-500", bg: "bg-orange-100" },
     { title: "Lesson Plan Builder", desc: "Differentiated daily/weekly lesson plans.", icon: BookOpen, color: "text-green-500", bg: "bg-green-100" },
+    { title: "BIP Generator", desc: "Behavior Intervention Plans with positive support strategies.", icon: Brain, color: "text-pink-500", bg: "bg-pink-100" },
+    { title: "Task Analysis Tool", desc: "Break down complex life skills into visual checklists.", icon: CheckCircle, color: "text-teal-500", bg: "bg-teal-100" },
   ];
   return (
     <div className="space-y-6 animate-fade-in">
