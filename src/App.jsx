@@ -434,8 +434,20 @@ export default function App() {
             <NavLink href="#about">About</NavLink>
             <NavLink href="#services">Services</NavLink>
             <NavLink href="#tools">Tools</NavLink>
-            <NavLink href="#booking">Booking</NavLink>
             <NavLink href="#testimonials">Testimonials</NavLink>
+            <hr className="border-gray-200 dark:border-gray-700" />
+            {session ? (
+              <>
+                <div className="font-medium text-primary py-2">Hi, {userProfile?.full_name?.split(' ')[0] || 'User'}</div>
+                <button onClick={() => { setShowDashboard(true); setMobileMenuOpen(false); }} className="w-full bg-primary text-white font-semibold py-2 rounded-lg text-center">Dashboard</button>
+                <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full border border-primary text-primary font-semibold py-2 rounded-lg text-center">Log Out</button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => { setAuthMode('login'); setShowSignup(true); setMobileMenuOpen(false); }} className="w-full bg-accent dark:bg-darkBgAlt text-primary dark:text-white font-semibold py-2 rounded-lg text-center">Log In</button>
+                <button onClick={() => { setAuthMode('signup'); setShowSignup(true); setMobileMenuOpen(false); }} className="w-full bg-primary text-white font-semibold py-2 rounded-lg text-center">Create Free Account</button>
+              </>
+            )}
           </div>
         )}
       </nav>
