@@ -437,12 +437,12 @@ export default function App() {
               India's trusted platform connecting parents of children with special needs to expert educators, therapists, and support services — all in one secure place.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <a href="#professionals" className="bg-primary hover:bg-purple-700 text-white px-8 py-3 rounded-full font-semibold text-lg transition-all shadow-lg shadow-primary/30 text-center btn-animated">
+              <button onClick={() => { setAuthMode('login'); setShowSignup(true); }} className="bg-primary hover:bg-purple-700 text-white px-8 py-3 rounded-full font-semibold text-lg transition-all shadow-lg shadow-primary/30 text-center btn-animated">
                 Find a Professional
-              </a>
-              <a href="#tools" className="border-2 border-primary text-primary dark:text-white dark:border-gray-600 dark:hover:border-primary px-8 py-3 rounded-full font-semibold text-lg transition-all hover:bg-accent dark:hover:bg-darkCard text-center btn-animated">
+              </button>
+              <button onClick={() => { setAuthMode('signup'); setShowSignup(true); }} className="border-2 border-primary text-primary dark:text-white dark:border-gray-600 dark:hover:border-primary px-8 py-3 rounded-full font-semibold text-lg transition-all hover:bg-accent dark:hover:bg-darkCard text-center btn-animated">
                 I'm an Educator
-              </a>
+              </button>
             </div>
           </div>
 
