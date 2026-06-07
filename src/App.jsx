@@ -595,7 +595,10 @@ export default function App() {
                 </div>
                 <h4 className="text-3xl font-extrabold mb-4 text-blue-900 dark:text-blue-300 relative z-10">M-CHAT Assessment</h4>
                 <p className="text-lg text-blue-700 dark:text-blue-500 mb-8 max-w-2xl relative z-10">The Modified Checklist for Autism in Toddlers. A globally validated developmental screening tool to identify early signs of autism. Recommended for children between 16-30 months.</p>
-                <button onClick={() => { setActiveTool('M-CHAT Assessment'); setMchatAnswers(Array(20).fill(null)); }} className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl transition-all btn-animated text-lg relative z-10">Start Full Screening</button>
+                <button onClick={() => { setActiveTool('M-CHAT Assessment'); setMchatAnswers(Array(20).fill(null)); }} className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl transition-all btn-animated text-lg relative z-10 mb-6">Start Full Screening</button>
+                <div className="text-sm font-semibold text-blue-800 dark:text-blue-300 relative z-10 bg-blue-100/50 dark:bg-blue-900/30 px-6 py-3 rounded-xl border border-blue-200 dark:border-blue-800">
+                  ⚠️ Note: This is a screening tool, it does not diagnose. For a formal diagnosis, please contact a pediatrician.
+                </div>
               </div>
             </div>
 
@@ -849,6 +852,12 @@ export default function App() {
                   ? 'Fill in the child details to begin the AI-guided M-CHAT developmental screening.'
                   : 'Fill in the details below to generate the document using AI without writing prompts.'}
               </p>
+              {activeTool === 'M-CHAT Assessment' && (
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 text-sm font-semibold rounded-lg border border-blue-100 dark:border-blue-800 flex items-center gap-2">
+                  <Activity size={16} />
+                  ⚠️ Note: This is a screening tool, it does not diagnose. For a formal diagnosis, please contact a pediatrician.
+                </div>
+              )}
             </div>
             <div className={`p-8 ${activeTool === 'M-CHAT Assessment' ? 'max-h-[60vh] overflow-y-auto' : ''} space-y-6`}>
               {activeTool === 'M-CHAT Assessment' ? (
