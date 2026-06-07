@@ -1,76 +1,279 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 import { 
-  Moon, Sun, Menu, X, Home, User, Users, Calendar, FileText, Wrench, MessageSquare, Bell, Settings, LogOut,
-  Search, CheckCircle, ChevronRight, Download, Eye, Plus, Star, MapPin, Video, UserPlus, Clock, Upload, Filter,
-  Trash2, Send, Paperclip, AlertCircle, RefreshCw, XCircle, FilePlus, ChevronLeft, Lock, Save, Shield
+  Menu, X, Moon, Sun, Brain, Star, ChevronRight, CheckCircle, 
+  MapPin, Phone, Mail, FileText, Activity, Users, Video, Calendar,
+  ChevronDown, ChevronUp, Quote, GraduationCap, Heart, Clock, BookOpen
 } from 'lucide-react';
+import Dashboard from './components/Dashboard';
 
-const mockProfessionals = [
-  { id: 1, name: "Dr. Priya Nair", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Chennai", rating: 4.9, reviews: 120 },
-  { id: 2, name: "Dr. Arjun Mehta", dept: "Psychology", qual: "Ph.D.", city: "Mumbai", rating: 4.8, reviews: 95 },
-  { id: 3, name: "Ms. Kavitha Ramachandran", dept: "Special Education", qual: "M.Ed. Special Education", city: "Bangalore", rating: 5.0, reviews: 200 },
-  { id: 4, name: "Dr. Sunita Sharma", dept: "Occupational Therapy", qual: "MOT", city: "Delhi", rating: 4.7, reviews: 85 },
-  { id: 5, name: "Ms. Deepa Krishnamurthy", dept: "Occupational Therapy", qual: "BOT", city: "Hyderabad", rating: 4.7, reviews: 110 },
-  { id: 6, name: "Mr. Rohit Verma", dept: "Special Education", qual: "B.Ed. Special Education", city: "Pune", rating: 4.6, reviews: 60 },
-  { id: 7, name: "Dr. Ananya Bose", dept: "Psychology", qual: "Psy.D.", city: "Kolkata", rating: 4.9, reviews: 150 },
-  { id: 8, name: "Ms. Meena Pillai", dept: "Occupational Therapy", qual: "OT (SI)", city: "Kochi", rating: 4.8, reviews: 130 },
-  { id: 9, name: "Dr. Rajeev Kulkarni", dept: "Special Education", qual: "M.Ed. Special Education", city: "Pune", rating: 5.0, reviews: 210 },
-  { id: 10, name: "Ms. Shreya Iyer", dept: "Speech-Language Therapy", qual: "B.Sc. SLP", city: "Chennai", rating: 4.5, reviews: 45 },
-  { id: 11, name: "Mr. Vikram Nambiar", dept: "Special Education", qual: "M.Ed.", city: "Bangalore", rating: 4.8, reviews: 140 },
-  { id: 12, name: "Dr. Pooja Agarwal", dept: "Psychology", qual: "Ph.D.", city: "Delhi", rating: 4.9, reviews: 180 },
-  { id: 13, name: "Ms. Lakshmi Venkatesh", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Hyderabad", rating: 4.7, reviews: 90 },
-  { id: 14, name: "Dr. Suresh Menon", dept: "Occupational Therapy", qual: "MOT", city: "Kochi", rating: 4.8, reviews: 115 },
-  { id: 15, name: "Ms. Neha Joshi", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Jaipur", rating: 4.7, reviews: 105 },
+const departments = [
+  "Special Education", "Speech-Language Therapy", "Occupational Therapy"
 ];
 
-const mockDocuments = [
-  { id: 1, name: "Aarav's IEP – Q3 2025", type: "IEP", child: "Aarav Mehta", date: "2025-07-01", creator: "Ms. Kavitha Ramachandran" },
-  { id: 2, name: "Autism Assessment Report", type: "Assessment", child: "Aarav Mehta", date: "2025-06-15", creator: "Dr. Arjun Mehta" },
-  { id: 3, name: "Weekly Lesson Plan", type: "Lesson Plan", child: "Class A", date: "2025-07-05", creator: "Mr. Vikram Nambiar" },
-  { id: 4, name: "ITP – Transition Goals", type: "ITP", child: "Rohan Iyer", date: "2025-05-20", creator: "Dr. Rajeev Kulkarni" },
-  { id: 5, name: "Speech Progress Report", type: "Progress Report", child: "Priya Sharma", date: "2025-07-10", creator: "Dr. Priya Nair" },
-  { id: 6, name: "Sensory Diet Plan", type: "Lesson Plan", child: "Ananya Krishnan", date: "2025-04-12", creator: "Dr. Sunita Sharma" },
-  { id: 7, name: "Aarav's IEP – Q1 2025", type: "IEP", child: "Aarav Mehta", date: "2025-01-10", creator: "Ms. Kavitha Ramachandran" },
-  { id: 8, name: "Behavioral Assessment", type: "Assessment", child: "Kabir Verma", date: "2025-04-05", creator: "Dr. Pooja Agarwal" }
+const fallbackProfessionals = [
+  { name: "Dr. Priya Nair", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Chennai", rating: 4.9 },
+  { name: "Ms. Kavitha Ramachandran", dept: "Special Education", qual: "M.Ed. Special Education", city: "Bangalore", rating: 5.0 },
+  { name: "Ms. Deepa Krishnamurthy", dept: "Occupational Therapy", qual: "BOT", city: "Hyderabad", rating: 4.7 },
+  { name: "Ms. Neha Joshi", dept: "Speech-Language Therapy", qual: "M.Sc. SLP", city: "Jaipur", rating: 4.7 },
+  { name: "Mr. Rajeev Kulkarni", dept: "Special Education", qual: "M.Ed. Special Education", city: "Pune", rating: 5.0 },
+  { name: "Ms. Meena Pillai", dept: "Occupational Therapy", qual: "OT (SI)", city: "Kochi", rating: 4.8 }
 ];
 
-const mockClients = [
-  { id: 1, name: "Aarav Mehta", age: 8, condition: "Autism", parent: "Ravi Mehta", lastSession: "2025-07-12", sessions: 24 },
-  { id: 2, name: "Priya Sharma", age: 6, condition: "Speech Delay", parent: "Anita Sharma", lastSession: "2025-07-10", sessions: 12 },
-  { id: 3, name: "Rohan Iyer", age: 10, condition: "ADHD", parent: "Karthik Iyer", lastSession: "2025-07-08", sessions: 36 },
-  { id: 4, name: "Ananya Krishnan", age: 7, condition: "Down Syndrome", parent: "Meera Krishnan", lastSession: "2025-07-11", sessions: 40 },
-  { id: 5, name: "Kabir Verma", age: 9, condition: "Learning Disability", parent: "Sanjay Verma", lastSession: "2025-07-05", sessions: 15 },
+const testimonials = [
+  { quote: "SimplyAbled made finding the right speech therapist for my son incredibly easy. The entire process is seamless.", name: "Aarti M.", role: "Parent", city: "Delhi" },
+  { quote: "The IEP Generator has saved me countless hours every week. I can finally focus more on my students rather than paperwork.", name: "Kavitha R.", role: "Special Educator", city: "Bangalore" },
+  { quote: "As an OT, having a platform that connects me to families who genuinely need my specialized help is a game changer.", name: "Deepa K.", role: "Occupational Therapist", city: "Hyderabad" },
+  { quote: "We booked Dr. Mehta for a developmental assessment. The virtual session option was a lifesaver for our busy schedule.", name: "Rohan S.", role: "Parent", city: "Mumbai" },
+  { quote: "The lesson plan builder creates specialized activities that my autistic students absolutely love. Highly recommended!", name: "Rajeev K.", role: "Special Educator", city: "Pune" },
+  { quote: "SimplyAbled is a centralized hub that Indian special education has needed for a very long time.", name: "Pooja A.", role: "Child Psychiatrist", city: "Delhi" }
 ];
 
-const mockAppointments = [
-  { id: 1, name: "Aarav Mehta", type: "Special Education", date: "2025-07-15", time: "10:00 AM", duration: "60 min", mode: "Online", status: "Upcoming" },
-  { id: 2, name: "Priya Sharma", type: "Speech Therapy", date: "2025-07-16", time: "02:00 PM", duration: "45 min", mode: "In-Person", status: "Pending" },
-  { id: 3, name: "Rohan Iyer", type: "Behavioral Therapy", date: "2025-07-10", time: "11:00 AM", duration: "60 min", mode: "Online", status: "Completed" },
-  { id: 4, name: "Kabir Verma", type: "Assessment", date: "2025-07-05", time: "04:00 PM", duration: "90 min", mode: "In-Person", status: "Cancelled" },
+const faqs = [
+  { q: "What is SimplyAbled?", a: "SimplyAbled is a dedicated platform connecting parents of children with special needs to expert educators, therapists, and related services." },
+  { q: "Who can use this platform?", a: "Parents looking for support, and verified special education professionals (educators, therapists, psychologists) looking to manage their practice and connect with families." },
+  { q: "How do I book an appointment?", a: "Navigate to the 'Booking' section, select the specialization, choose a professional, pick a date/time, and submit your request." },
+  { q: "What is an IEP?", a: "An Individualized Education Program (IEP) is a legally binding document detailing the specialized instruction and services a student with a disability will receive." },
+  { q: "Can I use the tools as a parent?", a: "Certain tracking tools are available to parents, but the IEP and Lesson Plan generators are designed specifically for educators and therapists." },
+  { q: "Are sessions available online?", a: "Yes, many of our professionals offer virtual/online sessions as well as in-person appointments." },
+  { q: "How are professionals verified?", a: "We strictly verify the educational qualifications, licenses, and background checks of every professional before they can list their services." },
+  { q: "Is my child's data secure?", a: "Absolutely. We follow strict data privacy protocols and ensure all health and educational records are encrypted and securely stored." }
 ];
 
-const mockConversations = [
-  { id: 1, name: "Ravi Mehta", preview: "Thanks for the updated IEP!", time: "10:30 AM", unread: 2 },
-  { id: 2, name: "Anita Sharma", preview: "Will we have our session tomorrow?", time: "Yesterday", unread: 0 },
-  { id: 3, name: "Karthik Iyer", preview: "Rohan has been doing much better.", time: "Mon", unread: 0 },
-  { id: 4, name: "Meera Krishnan", preview: "Can we reschedule to 4 PM?", time: "Last week", unread: 1 },
+const toolGoals = [
+  "Speech Articulation", "Sensory Regulation", "Fine Motor Skills", 
+  "Gross Motor Skills", "Social Interaction", "Behavioral Control", 
+  "Reading Comprehension", "Self-Feeding", "Task Focus", "Transitions"
 ];
 
-const mockNotifications = [
-  { id: 1, title: "Appointment Confirmed", desc: "Your session with Aarav is confirmed for July 15.", time: "2 hours ago", type: "Appointment", unread: true },
-  { id: 2, title: "IEP Generated", desc: "Aarav's Q3 IEP has been successfully generated.", time: "5 hours ago", type: "Document", unread: true },
-  { id: 3, title: "New Message", desc: "Ravi Mehta sent you a new message.", time: "1 day ago", type: "Message", unread: false },
-  { id: 4, title: "Profile Verified", desc: "Your professional profile has been verified.", time: "2 days ago", type: "System", unread: false },
+const mchatQuestions = [
+  "1. If you point at something across the room, does your child look at it?",
+  "2. Have you ever wondered if your child might be deaf?",
+  "3. Does your child play pretend or make-believe?",
+  "4. Does your child like climbing on things?",
+  "5. Does your child make unusual finger movements near his or her eyes?",
+  "6. Does your child point with one finger to ask for something or to get help?",
+  "7. Does your child point with one finger to show you something interesting?",
+  "8. Is your child interested in other children?",
+  "9. Does your child show you things by bringing them to you or holding them up for you to see?",
+  "10. Does your child respond when you call his or her name?",
+  "11. When you smile at your child, does he or she smile back at you?",
+  "12. Does your child get upset by everyday noises?",
+  "13. Does your child walk?",
+  "14. Does your child look you in the eye when you are talking, playing, or dressing?",
+  "15. Does your child try to copy what you do?",
+  "16. If you turn your head to look at something, does your child look around to see what you are looking at?",
+  "17. Does your child try to get you to watch him or her?",
+  "18. Does your child understand when you tell him or her to do something?",
+  "19. If something new happens, does your child look at your face to see how you feel about it?",
+  "20. Does your child like movement activities?"
 ];
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState('Parent');
-  const [currentView, setCurrentView] = useState('overview');
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [toast, setToast] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark' || false;
+  });
+  
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [bookingDept, setBookingDept] = useState('');
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [activeFaq, setActiveFaq] = useState(null);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const [activeTool, setActiveTool] = useState(null);
+  const [showSignup, setShowSignup] = useState(false);
+  const [selectedGoals, setSelectedGoals] = useState([]);
+  const [generatedDocument, setGeneratedDocument] = useState(null);
+  const [mchatAnswers, setMchatAnswers] = useState(Array(20).fill(null));
+  
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [professionalsList, setProfessionalsList] = useState(fallbackProfessionals);
+
+  // Supabase Auth State
+  const [session, setSession] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [authMode, setAuthMode] = useState('login');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authName, setAuthName] = useState('');
+  const [authRole, setAuthRole] = useState('Parent');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authMsg, setAuthMsg] = useState('');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) fetchProfile(session.user.id);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) fetchProfile(session.user.id);
+      else setUserProfile(null);
+    });
+
+    const fetchDynamicProfessionals = async () => {
+      const { data } = await supabase.from('profiles').select('*').eq('role', 'Professional').eq('is_approved', true);
+      if (data && data.length > 0) {
+        setProfessionalsList([...fallbackProfessionals, ...data.map(p => ({
+          name: p.full_name, dept: p.dept, qual: p.qual, city: p.city
+        }))]);
+      }
+    };
+    fetchDynamicProfessionals();
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (data) setUserProfile(data);
+  };
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true); setAuthError(''); setAuthMsg('');
+    try {
+      if (authMode === 'signup') {
+        const { data, error } = await supabase.auth.signUp({
+          email: authEmail, password: authPassword,
+          options: { data: { full_name: authName, role: authRole } }
+        });
+        if (error) throw error;
+        if (data.user) {
+          // Fallback manual insert in case trigger isn't setup
+          await supabase.from('profiles').upsert({ id: data.user.id, email: authEmail, full_name: authName, role: authRole });
+        }
+        setAuthMsg('Success! Check your email for verification.');
+      } else if (authMode === 'login') {
+        const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+        if (error) throw error;
+        setShowSignup(false);
+      } else if (authMode === 'reset') {
+        const { error } = await supabase.auth.resetPasswordForEmail(authEmail);
+        if (error) throw error;
+        setAuthMsg('Password reset link sent.');
+      }
+    } catch (err) { setAuthError(err.message); } 
+    finally { setAuthLoading(false); }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setAuthLoading(true); setAuthError(''); setAuthMsg('');
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin }
+      });
+      if (error) throw error;
+    } catch (err) {
+      setAuthError(err.message);
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => supabase.auth.signOut();
+
+  const handleGenerate = async () => {
+    if (!session) {
+      setActiveTool(null);
+      setAuthMode('signup');
+      setShowSignup(true);
+      return;
+    }
+
+    let docContent = '';
+    
+    if (activeTool === 'M-CHAT Assessment') {
+      if (mchatAnswers.includes(null)) {
+        alert("Please answer all 20 questions before generating the report.");
+        return;
+      }
+      let riskScore = 0;
+      mchatAnswers.forEach((ans, idx) => {
+        const isReverse = [1, 4, 11].includes(idx); // 0-indexed for questions 2, 5, 12
+        if ((isReverse && ans === 'Yes') || (!isReverse && ans === 'No')) riskScore++;
+      });
+      
+      let riskLevel = "Low Risk"; let color = "green";
+      let rec = "If child is under 24 months, screen again after 2nd birthday. No further action needed right now.";
+      if (riskScore >= 3 && riskScore <= 7) {
+        riskLevel = "Medium Risk"; color = "orange";
+        rec = "Administer Follow-Up interview. If score remains 2 or higher, refer for diagnostic evaluation.";
+      } else if (riskScore >= 8) {
+        riskLevel = "High Risk"; color = "red";
+        rec = "Bypass Follow-Up and refer immediately for diagnostic evaluation and early intervention.";
+      }
+
+      docContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+          <h1 style="color: #2563EB; border-bottom: 2px solid #2563EB; padding-bottom: 10px;">M-CHAT-R Screening Report</h1>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          <hr style="margin: 20px 0; border: 1px solid #eee;" />
+          
+          <div style="background-color: #f8fafc; padding: 20px; border-left: 5px solid ${color}; margin: 20px 0;">
+            <h2 style="color: ${color}; margin-top: 0;">Total Score: ${riskScore} / 20 (${riskLevel})</h2>
+            <p><strong>Recommendation:</strong> ${rec}</p>
+          </div>
+
+          <h3 style="color: #1e40af; margin-top: 30px;">Detailed Responses</h3>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; min-width: 500px; border-collapse: collapse; text-align: left; font-size: 14px;">
+              <tr style="background-color: #f1f5f9;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Question</th>
+                <th style="padding: 10px; border: 1px solid #ddd; width: 100px;">Response</th>
+              </tr>
+              ${mchatQuestions.map((q, i) => `
+                <tr>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${q}</td>
+                  <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: ${((i===1||i===4||i===11)?(mchatAnswers[i]==='Yes'):(mchatAnswers[i]==='No')) ? 'red' : 'green'}">${mchatAnswers[i]}</td>
+                </tr>
+              `).join('')}
+            </table>
+          </div>
+        </div>
+      `;
+    } else {
+      docContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; color: #333;">
+          <h1 style="color: #7C3AED; border-bottom: 2px solid #7C3AED; padding-bottom: 10px;">${activeTool} Document</h1>
+          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Prepared By:</strong> ${userProfile?.full_name || 'Educator'}</p>
+          <hr style="margin: 20px 0; border: 1px solid #eee;" />
+          
+          <h3 style="color: #4c1d95;">Primary Focus Areas</h3>
+          <ul style="line-height: 1.6;">
+            ${selectedGoals.length > 0 ? selectedGoals.map(g => `<li>${g}</li>`).join('') : '<li>General Assessment</li>'}
+          </ul>
+          
+          <h3 style="color: #4c1d95; margin-top: 30px;">AI-Generated Action Plan</h3>
+          <p style="line-height: 1.6;">Based on the selected focus areas, the following tailored interventions are recommended. This plan includes specific benchmarks for progress monitoring and suggested sensory and behavioral regulation strategies tailored for the individual needs.</p>
+          
+          <div style="background-color: #f3f4f6; padding: 15px; border-left: 4px solid #7C3AED; margin-top: 20px;">
+            <strong>Next Steps:</strong> Review this document with the support team and update benchmarks monthly.
+          </div>
+        </div>
+      `;
+    }
+
+    const { error } = await supabase.from('documents').insert([{ 
+      user_id: session.user.id, title: `${activeTool} - ${new Date().toLocaleDateString()}`, 
+      type: activeTool, content: docContent
+    }]);
+
+    if (!error) {
+      setActiveTool(null);
+      setGeneratedDocument({ title: activeTool, content: docContent });
+    } else alert('Error saving document: ' + error.message);
+  };
+
+  const toggleGoal = (goal) => {
+    setSelectedGoals(prev => 
+      prev.includes(goal) ? prev.filter(g => g !== goal) : [...prev, goal]
+    );
+  };
 
   useEffect(() => {
     if (darkMode) {
@@ -82,873 +285,840 @@ export default function App() {
     }
   }, [darkMode]);
 
-  const showToast = (msg, type = 'info') => {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 3000);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTestimonialIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleBookingSubmit = async (e) => {
+    e.preventDefault();
+    setBookingLoading(true);
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Save to Supabase
+    const { error } = await supabase.from('bookings').insert([{
+      parent_name: data.parent_name,
+      email: data.email,
+      phone: data.phone,
+      child_age: data.child_age,
+      condition: data.condition,
+      department: data.department,
+      professional: data.professional,
+      booking_date: data.booking_date,
+      booking_time: data.booking_time,
+      session_mode: data.mode,
+      notes: data.notes
+    }]);
+
+    if (!error) {
+      // Submit to Web3Forms to send email to nkdrop23@gmail.com
+      try {
+        await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: "YOUR_WEB3FORMS_ACCESS_KEY_HERE",
+            subject: `New Booking Lead from ${data.parent_name}`,
+            ...data
+          })
+        });
+      } catch (err) {
+        console.error("Email send failed", err);
+      }
+      
+      setBookingSuccess(true);
+      setTimeout(() => setBookingSuccess(false), 5000);
+      e.target.reset();
+    } else {
+      alert("Failed to submit booking: " + error.message);
+    }
+    setBookingLoading(false);
   };
 
-  const handleViewChange = (view) => {
-    setLoading(true);
-    setCurrentView(view);
-    setTimeout(() => setLoading(false), 1000);
-  };
+  const NavLink = ({ href, children }) => (
+    <a href={href} className="text-lightText dark:text-darkText hover:text-primary transition-colors font-medium" onClick={() => setMobileMenuOpen(false)}>
+      {children}
+    </a>
+  );
 
-  if (!isAuthenticated) {
-    return <AuthGate onLogin={(role) => { setUserRole(role); setIsAuthenticated(true); }} darkMode={darkMode} setDarkMode={setDarkMode} />;
+  if (showDashboard) {
+    return <Dashboard session={session} userProfile={userProfile} supabase={supabase} onClose={() => setShowDashboard(false)} />;
   }
 
-  const parentLinks = [
-    { id: 'overview', icon: Home, label: 'Dashboard' },
-    { id: 'find_professionals', icon: Search, label: 'Find Professionals' },
-    { id: 'appointments', icon: Calendar, label: 'My Appointments' },
-    { id: 'documents', icon: FileText, label: 'My Documents' },
-    { id: 'messages', icon: MessageSquare, label: 'Messages' },
-    { id: 'notifications', icon: Bell, label: 'Notifications' },
-    { id: 'settings', icon: Settings, label: 'Settings' },
-  ];
-
-  const educatorLinks = [
-    { id: 'overview', icon: Home, label: 'Dashboard' },
-    { id: 'onboarding', icon: FileText, label: 'My Profile' },
-    { id: 'clients', icon: Users, label: 'My Clients' },
-    { id: 'appointments', icon: Calendar, label: 'Appointments' },
-    { id: 'documents', icon: FileText, label: 'Generated Documents' },
-    { id: 'tools', icon: Wrench, label: 'Tools' },
-    { id: 'messages', icon: MessageSquare, label: 'Messages' },
-    { id: 'notifications', icon: Bell, label: 'Notifications' },
-    { id: 'settings', icon: Settings, label: 'Settings' },
-  ];
-
-  const links = userRole === 'Parent' ? parentLinks : educatorLinks;
-
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${darkMode ? 'dark bg-[#0F0A1E] text-[#F5F3FF]' : 'bg-[#F9F7FF] text-[#1F1235]'}`}>
-      
-      {/* SIDEBAR */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} flex flex-col transition-all duration-300 ${darkMode ? 'bg-[#1A1033] border-r border-[#3D2A7A]' : 'bg-white border-r border-gray-200'} z-20`}>
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-[#3D2A7A]">
-          {sidebarOpen && <span className="font-bold text-xl text-[#7C3AED]">SimplyAbled</span>}
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1E1244] text-[#7C3AED]">
-            <Menu size={20} />
-          </button>
-        </div>
-        
-        <div className="p-4 border-b border-gray-200 dark:border-[#3D2A7A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#7C3AED] text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-            {userRole === 'Parent' ? 'P' : 'E'}
-          </div>
-          {sidebarOpen && (
-            <div className="overflow-hidden">
-              <div className="font-bold truncate">{userRole === 'Parent' ? 'John Doe' : 'Dr. Educator'}</div>
-              <div className="text-xs text-[#7C3AED] bg-[#EDE9FE] dark:bg-[#1E1244] px-2 py-0.5 rounded-full inline-block mt-1">{userRole}</div>
-            </div>
-          )}
-        </div>
-
-        <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
-          {links.map(link => {
-            const isActive = currentView === link.id;
-            return (
-              <button 
-                key={link.id} 
-                onClick={() => handleViewChange(link.id)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${isActive ? 'bg-[#7C3AED] text-white' : 'hover:bg-[#EDE9FE] dark:hover:bg-[#1E1244]'}`}
-                title={!sidebarOpen ? link.label : ''}
-              >
-                <link.icon size={20} className={isActive ? 'text-white' : 'text-[#A78BFA]'} />
-                {sidebarOpen && <span className="font-medium whitespace-nowrap">{link.label}</span>}
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-darkBg text-darkText' : 'bg-white text-lightText'}`}>
+      {/* 1. NAVBAR */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 dark:bg-darkBg/90 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-5'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            <a href="#" className="flex items-center gap-2">
+              <img src="/SIMPLYLOGO-transparent.png" alt="SimplyAbled Logo" className="h-16 md:h-24 object-contain" />
+              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+                SimplyAbled
+              </span>
+            </a>
+            
+            <div className="hidden md:flex items-center gap-6">
+              <NavLink href="#about">About</NavLink>
+              <NavLink href="#services">Services</NavLink>
+              <NavLink href="#tools">Tools</NavLink>
+              <NavLink href="#testimonials">Testimonials</NavLink>
+              <button onClick={() => setDarkMode(!darkMode)} className="p-2 rounded-full hover:bg-accent dark:hover:bg-darkCard transition-colors">
+                {darkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
               </button>
-            )
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-gray-200 dark:border-[#3D2A7A]">
-          <button onClick={() => setIsAuthenticated(false)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all`}>
-            <LogOut size={20} />
-            {sidebarOpen && <span className="font-medium">Logout</span>}
-          </button>
-        </div>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
-        {/* TOP NAVBAR */}
-        <header className={`h-16 flex items-center justify-between px-6 border-b z-10 transition-colors duration-200 ${darkMode ? 'bg-[#1A1033] border-[#3D2A7A]' : 'bg-white border-gray-200'}`}>
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold capitalize">{currentView.replace('_', ' ')}</h1>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input type="text" placeholder="Search..." className={`pl-10 pr-4 py-2 rounded-full text-sm outline-none transition-colors ${darkMode ? 'bg-[#1E1244] border-[#3D2A7A] focus:border-[#7C3AED]' : 'bg-gray-100 border-gray-200 focus:border-[#7C3AED]'} border`} />
+              
+              {session ? (
+                <div className="flex items-center gap-4">
+                  <span className="font-medium text-primary hidden lg:inline-block">Hi, {userProfile?.full_name?.split(' ')[0] || 'User'}</span>
+                  <button onClick={() => setShowDashboard(true)} className="font-bold text-primary hover:underline hidden sm:block">Dashboard</button>
+                  <button onClick={handleLogout} className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-full font-medium transition-all">
+                    Log out
+                  </button>
+                  <a href="#booking" className="bg-primary hover:bg-purple-700 text-white px-6 py-2 rounded-full font-medium transition-all shadow-lg hover:shadow-primary/50 btn-animated">
+                    Book Now
+                  </a>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button onClick={() => { setAuthMode('login'); setShowSignup(true); }} className="text-primary font-medium px-4 py-2 hover:bg-accent dark:hover:bg-darkCard rounded-full transition-all">
+                    Sign In
+                  </button>
+                  <a href="#booking" className="bg-primary hover:bg-purple-700 text-white px-6 py-2 rounded-full font-medium transition-all shadow-lg hover:shadow-primary/50 btn-animated">
+                    Book Now
+                  </a>
+                </div>
+              )}
             </div>
-            
-            <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-[#1E1244]' : 'hover:bg-gray-100'}`}>
-              {darkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-[#1F1235]" />}
-            </button>
-            
-            <button onClick={() => handleViewChange('notifications')} className={`p-2 rounded-full relative transition-colors ${darkMode ? 'hover:bg-[#1E1244]' : 'hover:bg-gray-100'}`}>
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#1A1033]"></span>
-            </button>
-          </div>
-        </header>
 
-        {/* PAGE CONTENT */}
-        <main className="flex-1 overflow-y-auto p-6 relative">
-          {loading ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-[#0F0A1E]/50 backdrop-blur-sm z-50">
-              <div className="animate-pulse flex flex-col items-center gap-4">
-                <div className="w-12 h-12 border-4 border-[#7C3AED] border-t-transparent rounded-full animate-spin"></div>
-                <div className="text-[#7C3AED] font-bold">Loading...</div>
+            <div className="md:hidden flex items-center gap-4">
+              <button onClick={() => setDarkMode(!darkMode)} className="p-2">
+                {darkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5 text-gray-600" />}
+              </button>
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-lightText dark:text-darkText">
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-darkBgAlt shadow-xl border-t dark:border-gray-800 py-4 px-6 flex flex-col gap-4">
+            <NavLink href="#about">About</NavLink>
+            <NavLink href="#services">Services</NavLink>
+            <NavLink href="#tools">Tools</NavLink>
+            <NavLink href="#booking">Booking</NavLink>
+            <NavLink href="#testimonials">Testimonials</NavLink>
+          </div>
+        )}
+      </nav>
+
+      {/* 2. HERO SECTION */}
+      <section className="pt-32 pb-20 lg:pt-40 lg:pb-28 px-4 bg-gradient-to-br from-accent via-white to-white dark:from-darkBgAlt dark:via-darkBg dark:to-darkBg overflow-hidden relative">
+        <div className="absolute top-20 right-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 left-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl"></div>
+        
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+          <div className="space-y-8 text-center lg:text-left">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
+              Empowering Every Child. <br/>
+              <span className="text-primary">Connecting Every Family.</span>
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto lg:mx-0">
+              India's trusted platform connecting parents of children with special needs to expert educators, therapists, and support services — all in one secure place.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <a href="#professionals" className="bg-primary hover:bg-purple-700 text-white px-8 py-3 rounded-full font-semibold text-lg transition-all shadow-lg shadow-primary/30 text-center btn-animated">
+                Find a Professional
+              </a>
+              <a href="#tools" className="border-2 border-primary text-primary dark:text-white dark:border-gray-600 dark:hover:border-primary px-8 py-3 rounded-full font-semibold text-lg transition-all hover:bg-accent dark:hover:bg-darkCard text-center btn-animated">
+                I'm an Educator
+              </a>
+            </div>
+          </div>
+
+          <div className="relative h-[400px] hidden md:block">
+            <div className="absolute top-0 right-10 bg-white dark:bg-darkCard p-4 rounded-2xl shadow-xl w-64 animate-float border border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-accent text-primary p-2 rounded-lg"><FileText size={20} /></div>
+                <div className="font-bold">IEP Generator</div>
+              </div>
+              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-4/5"></div>
+            </div>
+
+            <div className="absolute top-1/3 left-0 bg-white dark:bg-darkCard p-4 rounded-2xl shadow-xl w-64 animate-float-delayed border border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-blue-100 text-blue-600 p-2 rounded-lg"><Calendar size={20} /></div>
+                <div className="font-bold">Appointment Booked</div>
+              </div>
+              <div className="text-sm text-gray-500">Dr. Priya Nair - Tomorrow, 10 AM</div>
+            </div>
+
+            <div className="absolute bottom-10 right-20 bg-white dark:bg-darkCard p-4 rounded-2xl shadow-xl w-64 animate-float border border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-green-100 text-green-600 p-2 rounded-lg"><Activity size={20} /></div>
+                <div className="font-bold">Milestone Tracked</div>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Speech</span>
+                <span className="text-green-600 font-bold">+15%</span>
               </div>
             </div>
-          ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {currentView === 'overview' && <Overview userRole={userRole} changeView={handleViewChange} />}
-              {currentView === 'find_professionals' && <FindProfessionals />}
-              {currentView === 'appointments' && <Appointments userRole={userRole} showToast={showToast} />}
-              {currentView === 'documents' && <Documents userRole={userRole} />}
-              {currentView === 'onboarding' && <Onboarding />}
-              {currentView === 'clients' && <Clients />}
-              {currentView === 'tools' && <Tools showToast={showToast} />}
-              {currentView === 'messages' && <Messages />}
-              {currentView === 'notifications' && <Notifications />}
-              {currentView === 'settings' && <SettingsView userRole={userRole} showToast={showToast} />}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. ABOUT SECTION */}
+      <section id="about" className="py-20 px-4 bg-white dark:bg-darkBg">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            What is SimplyAbled?
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6 text-lg text-gray-600 dark:text-gray-300">
+              <p>
+                SimplyAbled was built on a singular belief: every child deserves the right support, and every parent deserves peace of mind. Navigating the world of special education and therapy can be overwhelming. We simplify the journey.
+              </p>
+              <p>
+                Whether you need a Speech Therapist in Chennai, a Special Educator in Delhi, or an AI tool to generate an IEP for your classroom, SimplyAbled bridges the gap between dedicated professionals and the families who need them most.
+              </p>
+              <div className="flex items-center gap-2 text-primary font-bold mt-4">
+                <CheckCircle className="h-6 w-6" />
+                <span>Focusing on inclusive education & early intervention.</span>
+              </div>
             </div>
-          )}
-        </main>
-      </div>
-
-      {/* TOAST */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50 text-white font-medium ${toast.type === 'error' ? 'bg-red-500' : toast.type === 'success' ? 'bg-green-500' : 'bg-[#7C3AED]'}`}>
-          {toast.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle size={20} />}
-          {toast.msg}
+            
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="bg-accent dark:bg-darkCard p-6 rounded-2xl text-center shadow-lg hover:-translate-y-1 transition-transform">
+                <Users className="h-10 w-10 text-primary mx-auto mb-3" />
+                <div className="text-3xl font-extrabold text-lightText dark:text-white">500+</div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">Verified Professionals</div>
+              </div>
+              <div className="bg-accent dark:bg-darkCard p-6 rounded-2xl text-center shadow-lg hover:-translate-y-1 transition-transform sm:translate-y-4">
+                <Heart className="h-10 w-10 text-primary mx-auto mb-3" />
+                <div className="text-3xl font-extrabold text-lightText dark:text-white">10k+</div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">Families Helped</div>
+              </div>
+              <div className="bg-accent dark:bg-darkCard p-6 rounded-2xl text-center shadow-lg hover:-translate-y-1 transition-transform sm:col-span-2">
+                <Brain className="h-10 w-10 text-primary mx-auto mb-3" />
+                <div className="text-3xl font-extrabold text-lightText dark:text-white">20+</div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">Specializations Covered</div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </section>
 
-// ==========================================
-// AUTHENTICATION GATE
-// ==========================================
-function AuthGate({ onLogin, darkMode, setDarkMode }) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [role, setRole] = useState('Parent');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setError(true);
-      return;
-    }
-    onLogin(role);
-  };
-
-  return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200 ${darkMode ? 'bg-[#0F0A1E] text-[#F5F3FF]' : 'bg-[#F9F7FF] text-[#1F1235]'}`}>
-      <div className="absolute top-6 right-6">
-        <button onClick={() => setDarkMode(!darkMode)} className="p-3 rounded-full bg-white dark:bg-[#1E1244] shadow-md">
-          {darkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} />}
-        </button>
-      </div>
-      
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold text-[#7C3AED] mb-2">SimplyAbled</h1>
-        <p className="text-[#A78BFA] font-medium text-lg">Empowering Every Child. Connecting Every Family.</p>
-      </div>
-
-      <div className={`w-full max-w-md p-8 rounded-3xl shadow-xl transition-colors duration-200 ${darkMode ? 'bg-[#1E1244]' : 'bg-white'}`}>
-        <h2 className="text-2xl font-bold mb-6 text-center">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-        
-        <div className="flex bg-gray-100 dark:bg-[#1A1033] rounded-xl p-1 mb-6">
-          <button onClick={() => setRole('Parent')} className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${role === 'Parent' ? 'bg-[#7C3AED] text-white shadow-md' : 'text-gray-500'}`}>I am a Parent</button>
-          <button onClick={() => setRole('Educator')} className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${role === 'Educator' ? 'bg-[#7C3AED] text-white shadow-md' : 'text-gray-500'}`}>I am an Educator</button>
+      {/* 4. HOW IT WORKS */}
+      <section id="how-it-works" className="py-20 px-4 bg-accent dark:bg-darkBgAlt">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            How SimplyAbled Works
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            <div className="hidden md:block absolute top-12 left-1/6 right-1/6 h-0.5 bg-primary/20 z-0"></div>
+            
+            <div className="bg-white dark:bg-darkCard p-8 rounded-2xl shadow-xl relative z-10 text-center border-b-4 border-primary">
+              <div className="bg-primary text-white h-16 w-16 rounded-full flex items-center justify-center mx-auto -mt-16 mb-6 shadow-lg text-2xl font-bold">1</div>
+              <h3 className="text-xl font-bold mb-3">Create Your Profile</h3>
+              <p className="text-gray-600 dark:text-gray-400">Join as a parent seeking support or as a professional offering services. Setup takes 2 minutes.</p>
+            </div>
+            
+            <div className="bg-white dark:bg-darkCard p-8 rounded-2xl shadow-xl relative z-10 text-center border-b-4 border-primary mt-8 md:mt-0">
+              <div className="bg-primary text-white h-16 w-16 rounded-full flex items-center justify-center mx-auto -mt-16 mb-6 shadow-lg text-2xl font-bold">2</div>
+              <h3 className="text-xl font-bold mb-3">Find the Right Expert</h3>
+              <p className="text-gray-600 dark:text-gray-400">Filter by location, specialization, and ratings to find the perfect match for your child's needs.</p>
+            </div>
+            
+            <div className="bg-white dark:bg-darkCard p-8 rounded-2xl shadow-xl relative z-10 text-center border-b-4 border-primary mt-8 md:mt-0">
+              <div className="bg-primary text-white h-16 w-16 rounded-full flex items-center justify-center mx-auto -mt-16 mb-6 shadow-lg text-2xl font-bold">3</div>
+              <h3 className="text-xl font-bold mb-3">Book & Track Progress</h3>
+              <p className="text-gray-600 dark:text-gray-400">Schedule online or in-person sessions securely. Generate reports and track milestones effortlessly.</p>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+      {/* 5. SERVICES SECTION */}
+      <section id="services" className="py-20 px-4 bg-white dark:bg-darkBg">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Our Specializations
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {departments.map((dept, idx) => (
+              <div key={idx} className="group bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-sm hover:shadow-xl hover:border-primary/50 transition-all cursor-pointer text-center">
+                <div className="bg-accent dark:bg-darkBgAlt w-16 h-16 mx-auto rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-6 shadow-sm">
+                  {idx === 0 ? <Users size={28} /> : idx === 1 ? <Activity size={28} /> : <Brain size={28} />}
+                </div>
+                <h3 className="font-bold text-xl mb-3">{dept}</h3>
+                <p className="text-gray-500 dark:text-gray-400">Expert, evidence-based support from verified professionals.</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* 7. TOOLS */}
+      <section id="tools" className="py-20 px-4 bg-white dark:bg-darkBg">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
+            Powerful Tools for Parents & Educators
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="space-y-16">
+            {/* Clinical Screening */}
             <div>
-              <label className="text-sm font-bold mb-1 block">Full Name</label>
-              <input type="text" className={`w-full px-4 py-3 rounded-xl border ${darkMode ? 'bg-[#0F0A1E] border-[#3D2A7A]' : 'bg-gray-50 border-gray-200'} outline-none focus:border-[#7C3AED]`} placeholder="John Doe" />
+              <h3 className="text-2xl font-bold text-center mb-8 text-blue-800 dark:text-blue-400">Clinical Screening</h3>
+              <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-darkBgAlt dark:to-gray-900 border border-blue-100 dark:border-gray-800 p-8 md:p-12 rounded-3xl shadow-xl hover:-translate-y-2 transition-transform text-center flex flex-col items-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-10"><Activity size={200} /></div>
+                <div className="w-24 h-24 bg-white dark:bg-darkCard rounded-full flex items-center justify-center mb-6 shadow-md relative z-10">
+                  <Users className="h-12 w-12 text-blue-600" />
+                </div>
+                <h4 className="text-3xl font-extrabold mb-4 text-blue-900 dark:text-blue-300 relative z-10">M-CHAT Assessment</h4>
+                <p className="text-lg text-blue-700 dark:text-blue-500 mb-8 max-w-2xl relative z-10">The Modified Checklist for Autism in Toddlers. A globally validated developmental screening tool to identify early signs of autism. Recommended for children between 16-30 months.</p>
+                <button onClick={() => { setActiveTool('M-CHAT Assessment'); setMchatAnswers(Array(20).fill(null)); }} className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl transition-all btn-animated text-lg relative z-10">Start Full Screening</button>
+              </div>
             </div>
-          )}
+
+            {/* Educator Document Generators */}
+            <div>
+              <h3 className="text-2xl font-bold text-center mb-8 text-primary">AI Document Generators</h3>
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <Activity className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">IEP Generator</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">AI-assisted Individual Education Plan creation with smart goals, benchmarks, and timelines.</p>
+                  <button onClick={() => setActiveTool('IEP Generator')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+                
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <GraduationCap className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">ITP Generator</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Individual Transition Plans for older students with vocational and life-skills goals.</p>
+                  <button onClick={() => setActiveTool('ITP Generator')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+
+                <div className="bg-white dark:bg-darkCard border border-gray-100 dark:border-gray-800 p-8 rounded-3xl shadow-lg hover:-translate-y-2 transition-transform flex flex-col">
+                  <BookOpen className="h-12 w-12 text-primary mb-6" />
+                  <h4 className="text-xl font-bold mb-3">Lesson Planner</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 flex-1">Customizable, disability-specific weekly lesson plans with downloadable templates.</p>
+                  <button onClick={() => setActiveTool('Lesson Planner')} className="w-full text-center py-3 bg-accent text-primary dark:bg-darkBgAlt hover:bg-primary hover:text-white font-bold rounded-xl transition-colors border border-primary/20">Use Tool</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. BOOKING SECTION */}
+      <section id="booking" className="py-20 px-4 bg-accent dark:bg-darkBgAlt">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Book an Appointment
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="bg-white dark:bg-darkCard rounded-2xl shadow-2xl p-8 md:p-12 relative overflow-hidden">
+            {bookingSuccess ? (
+              <div className="text-center py-16 animate-up">
+                <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle size={48} />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Appointment Requested!</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-8">Your appointment has been booked. The professional will confirm via email within 24 hours.</p>
+                <button onClick={() => setBookingSuccess(false)} className="bg-primary hover:bg-purple-700 text-white px-8 py-3 rounded-full font-semibold transition-all">
+                  Book Another
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Parent / Guardian Name *</label>
+                  <input required name="parent_name" type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="John Doe" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Email Address *</label>
+                  <input required name="email" type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="john@example.com" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Phone Number *</label>
+                  <input required name="phone" type="tel" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="+91 XXXXX XXXXX" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Child's Age *</label>
+                  <input required name="child_age" type="number" min="0" max="25" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="e.g. 5" />
+                </div>
+                
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-sm font-semibold">Primary Concern / Condition *</label>
+                  <select name="condition" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Condition</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Down Syndrome</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Learning Disability</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Speech Delay</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Cerebral Palsy</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Behavioral Issues</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Other / Unsure</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Department *</label>
+                  <select name="department" required value={bookingDept} onChange={(e) => setBookingDept(e.target.value)} className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Department</option>
+                    {departments.map(d => <option key={d} value={d} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{d}</option>)}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Select Professional *</label>
+                  <select name="professional" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all disabled:opacity-50" disabled={!bookingDept}>
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{bookingDept ? "Select Expert" : "Select Department First"}</option>
+                    {professionalsList.filter(p => p.dept === bookingDept).map(p => (
+                      <option key={p.name} value={p.name} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{p.name} - {p.city || 'Remote'}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Preferred Date *</label>
+                  <input required name="booking_date" type="date" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold">Preferred Time *</label>
+                  <select name="booking_time" required className="w-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                    <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select Time Slot</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Morning (9 AM - 12 PM)</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Afternoon (12 PM - 3 PM)</option>
+                    <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Evening (3 PM - 6 PM)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-semibold">Session Mode *</label>
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Online" required className="text-primary focus:ring-primary"/> Online (Video Call)</label>
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="radio" name="mode" value="Home Session" required className="text-primary focus:ring-primary"/> Home Session</label>
+                  </div>
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-sm font-semibold">Additional Notes (Optional)</label>
+                  <textarea name="notes" rows="3" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Briefly describe any specific requirements..."></textarea>
+                </div>
+
+                <div className="md:col-span-2 pt-4">
+                  <button disabled={bookingLoading} type="submit" className="w-full bg-primary hover:bg-purple-700 disabled:opacity-50 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg shadow-primary/30 btn-animated">
+                    {bookingLoading ? 'Processing...' : 'Confirm Appointment'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. TESTIMONIALS */}
+      <section id="testimonials" className="py-20 px-4 bg-white dark:bg-darkBg">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12">
+            What Families & Educators Say
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="bg-accent dark:bg-darkCard p-8 md:p-12 rounded-3xl relative shadow-xl min-h-[300px] flex flex-col justify-center transition-all duration-500">
+            <Quote className="absolute top-6 left-6 h-12 w-12 text-primary/20 rotate-180" />
+            <p className="text-xl md:text-2xl italic font-medium mb-8 px-4 md:px-12 leading-relaxed">
+              "{testimonials[testimonialIndex].quote}"
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg shadow-md">
+                {testimonials[testimonialIndex].name.substring(0,2)}
+              </div>
+              <div className="text-left">
+                <div className="font-bold text-lg">{testimonials[testimonialIndex].name}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{testimonials[testimonialIndex].role} • {testimonials[testimonialIndex].city}</div>
+                <div className="flex text-yellow-500 mt-1"><Star size={14} className="fill-current"/><Star size={14} className="fill-current"/><Star size={14} className="fill-current"/><Star size={14} className="fill-current"/><Star size={14} className="fill-current"/></div>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center gap-2 mt-6">
+            {testimonials.map((_, i) => (
+              <button key={i} onClick={() => setTestimonialIndex(i)} className={`h-2 rounded-full transition-all ${i === testimonialIndex ? 'w-8 bg-primary' : 'w-2 bg-gray-300 dark:bg-gray-700'}`}></button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. BLOG PREVIEW */}
+      <section id="blog" className="py-20 px-4 bg-accent dark:bg-darkBgAlt">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Resources & Insights
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-darkCard rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-purple-200 dark:bg-purple-900 flex items-center justify-center"><FileText size={48} className="text-primary opacity-50"/></div>
+              <div className="p-6">
+                <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">IEP Tips</span>
+                <h3 className="text-xl font-bold mb-3">Demystifying the IEP Process for Parents</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">Understanding your child's Individualized Education Program doesn't have to be overwhelming. Here's a step-by-step guide.</p>
+                <a href="#" className="font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">Read More <ChevronRight size={16}/></a>
+              </div>
+            </div>
+            
+            <div className="bg-white dark:bg-darkCard rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-blue-200 dark:bg-blue-900 flex items-center justify-center"><Brain size={48} className="text-blue-500 opacity-50"/></div>
+              <div className="p-6">
+                <span className="text-xs font-bold text-blue-600 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Autism</span>
+                <h3 className="text-xl font-bold mb-3">Creating a Sensory Diet at Home</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">Practical strategies for occupational therapy at home to help children with autism regulate their sensory needs.</p>
+                <a href="#" className="font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">Read More <ChevronRight size={16}/></a>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-darkCard rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-green-200 dark:bg-green-900 flex items-center justify-center"><Activity size={48} className="text-green-500 opacity-50"/></div>
+              <div className="p-6">
+                <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full uppercase tracking-wider mb-4 inline-block">Early Intervention</span>
+                <h3 className="text-xl font-bold mb-3">Why the First 5 Years Matter Most</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">Research shows that early intervention can significantly alter a child's developmental trajectory. Learn the signs.</p>
+                <a href="#" className="font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all">Read More <ChevronRight size={16}/></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 11. FAQ SECTION */}
+      <section id="faq" className="py-20 px-4 bg-white dark:bg-darkBg">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Frequently Asked Questions
+            <div className="h-1 w-24 bg-primary mx-auto mt-4 rounded-full"></div>
+          </h2>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+                <button 
+                  onClick={() => setActiveFaq(activeFaq === idx ? null : idx)} 
+                  className="w-full flex justify-between items-center p-5 text-left bg-gray-50 dark:bg-darkCard hover:bg-gray-100 dark:hover:bg-darkBgAlt transition-colors font-bold text-lg"
+                >
+                  {faq.q}
+                  {activeFaq === idx ? <ChevronUp className="text-primary flex-shrink-0" /> : <ChevronDown className="text-gray-400 flex-shrink-0" />}
+                </button>
+                {activeFaq === idx && (
+                  <div className="p-5 bg-white dark:bg-darkBg border-t border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* 13. FOOTER */}
+      <footer className="bg-[#110B24] text-white pt-16 pb-8 px-4 border-t-4 border-primary">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           
           <div>
-            <label className="text-sm font-bold mb-1 block">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className={`w-full px-4 py-3 rounded-xl border ${error && !email ? 'border-red-500' : darkMode ? 'bg-[#0F0A1E] border-[#3D2A7A]' : 'bg-gray-50 border-gray-200'} outline-none focus:border-[#7C3AED]`} placeholder={role === 'Parent' ? 'parent@simplyabled.com' : 'educator@simplyabled.com'} />
+            <a href="#" className="flex items-center gap-2 mb-6">
+              <img src="/SIMPLYLOGO-transparent.png" alt="SimplyAbled Logo" className="h-16 md:h-24 object-contain" />
+              <span className="text-2xl font-bold text-white">SimplyAbled</span>
+            </a>
+            <p className="text-gray-400 mb-6">
+              Empowering Every Child.<br/>Connecting Every Family.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">Fb</a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">Ig</a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">Tw</a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">In</a>
+            </div>
           </div>
-          
-          <div className="relative">
-            <label className="text-sm font-bold mb-1 block">Password</label>
-            <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} className={`w-full px-4 py-3 rounded-xl border ${error && !password ? 'border-red-500' : darkMode ? 'bg-[#0F0A1E] border-[#3D2A7A]' : 'bg-gray-50 border-gray-200'} outline-none focus:border-[#7C3AED]`} placeholder="pass123" />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-10 text-gray-400">
-              <Eye size={18} />
+
+          <div>
+            <h4 className="text-lg font-bold mb-6 border-b border-white/10 pb-2">Quick Links</h4>
+            <ul className="space-y-3">
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Home</a></li>
+              <li><a href="#about" className="text-gray-400 hover:text-primary transition-colors">About Us</a></li>
+              <li><a href="#services" className="text-gray-400 hover:text-primary transition-colors">Services</a></li>
+              <li><a href="#booking" className="text-gray-400 hover:text-primary transition-colors">Book Now</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-bold mb-6 border-b border-white/10 pb-2">For Professionals</h4>
+            <ul className="space-y-3">
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Join as Expert</a></li>
+              <li><a href="#tools" className="text-gray-400 hover:text-primary transition-colors">Educator Tools</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Dashboard Login</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Upload Resources</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-lg font-bold mb-6 border-b border-white/10 pb-2">Legal</h4>
+            <ul className="space-y-3">
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Refund Policy</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Accessibility Statement</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto pt-8 border-t border-white/10 text-center text-gray-500 text-sm flex flex-col md:flex-row justify-between items-center">
+          <p>© 2025 SimplyAbled. All rights reserved.</p>
+          <p className="mt-2 md:mt-0">Made with ❤️ for every child in India & beyond.</p>
+        </div>
+      </footer>
+
+      {/* TOOL MODAL */}
+      {activeTool && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden relative animate-slide-up">
+            <button onClick={() => setActiveTool(null)} className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-darkBg rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors z-10">
+              <X size={20} />
             </button>
-          </div>
-
-          <button type="submit" className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-purple-500/30 mt-4">
-            {isLogin ? 'Login' : 'Sign Up'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center text-sm font-medium">
-          {isLogin ? (
-            <p>Don't have an account? <button onClick={() => setIsLogin(false)} className="text-[#7C3AED] hover:underline">Sign up</button></p>
-          ) : (
-            <p>Already have an account? <button onClick={() => setIsLogin(true)} className="text-[#7C3AED] hover:underline">Login</button></p>
-          )}
-        </div>
-        
-        {isLogin && (
-          <div className="mt-8 pt-4 border-t border-gray-200 dark:border-[#3D2A7A] text-xs text-center text-gray-500">
-            <p className="mb-1 font-bold">Mock Credentials:</p>
-            <p>Parent: parent@simplyabled.com / pass123</p>
-            <p>Educator: educator@simplyabled.com / pass123</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: OVERVIEW
-// ==========================================
-function Overview({ userRole, changeView }) {
-  const AnimatedNumber = ({ end }) => {
-    const [val, setVal] = useState(0);
-    useEffect(() => {
-      let start = 0;
-      const duration = 1000;
-      const increment = end / (duration / 16);
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= end) { setVal(end); clearInterval(timer); }
-        else { setVal(Math.floor(start)); }
-      }, 16);
-      return () => clearInterval(timer);
-    }, [end]);
-    return <span>{val}</span>;
-  };
-
-  if (userRole === 'Parent') {
-    return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] p-8 rounded-3xl text-white shadow-lg">
-          <h2 className="text-3xl font-extrabold mb-2">Good morning, John 👋</h2>
-          <p className="opacity-90">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Upcoming Appts', val: 2, icon: Calendar, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-            { label: 'Documents', val: 8, icon: FileText, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-            { label: 'Professionals', val: 3, icon: Users, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
-            { label: 'Unread Msgs', val: 5, icon: MessageSquare, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }
-          ].map((stat, i) => (
-            <div key={i} className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-              <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-xl flex items-center justify-center mb-4`}>
-                <stat.icon size={24} />
-              </div>
-              <div className="text-3xl font-black"><AnimatedNumber end={stat.val} /></div>
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{stat.label}</div>
+            <div className="p-8 border-b border-gray-100 dark:border-gray-800 bg-accent/50 dark:bg-darkBgAlt/50">
+              <h3 className="text-2xl font-bold text-primary mb-2">
+                {activeTool === 'M-CHAT Assessment' ? 'M-CHAT Screening Tool' : `${activeTool} Generator`}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {activeTool === 'M-CHAT Assessment' 
+                  ? 'Fill in the child details to begin the AI-guided M-CHAT developmental screening.'
+                  : 'Fill in the details below to generate the document using AI without writing prompts.'}
+              </p>
             </div>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Upcoming Appointments</h3>
-              <button onClick={() => changeView('appointments')} className="text-[#7C3AED] text-sm font-bold hover:underline">View All</button>
-            </div>
-            <div className="space-y-4">
-              {mockAppointments.slice(0, 2).map(apt => (
-                <div key={apt.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0F0A1E] rounded-xl border border-gray-200 dark:border-[#3D2A7A]">
-                  <div>
-                    <div className="font-bold">{apt.name}</div>
-                    <div className="text-sm text-gray-500">{apt.date} at {apt.time}</div>
-                  </div>
-                  <button className="px-4 py-2 bg-[#7C3AED] text-white text-sm font-bold rounded-lg shadow-sm">Join</button>
+            <div className={`p-8 ${activeTool === 'M-CHAT Assessment' ? 'max-h-[60vh] overflow-y-auto' : ''} space-y-6`}>
+              {activeTool === 'M-CHAT Assessment' ? (
+                <div className="space-y-6">
+                  {mchatQuestions.map((question, qIdx) => (
+                    <div key={qIdx} className="bg-gray-50 dark:bg-darkBg p-4 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <p className="font-semibold mb-3">{question}</p>
+                      <div className="flex gap-4">
+                        <button 
+                          onClick={() => { const newAns = [...mchatAnswers]; newAns[qIdx] = 'Yes'; setMchatAnswers(newAns); }}
+                          className={`flex-1 py-2 rounded-lg font-bold border-2 transition-all ${mchatAnswers[qIdx] === 'Yes' ? 'border-primary bg-primary text-white' : 'border-gray-300 text-gray-500 hover:border-primary'}`}
+                        >
+                          Yes
+                        </button>
+                        <button 
+                          onClick={() => { const newAns = [...mchatAnswers]; newAns[qIdx] = 'No'; setMchatAnswers(newAns); }}
+                          className={`flex-1 py-2 rounded-lg font-bold border-2 transition-all ${mchatAnswers[qIdx] === 'No' ? 'border-primary bg-primary text-white' : 'border-gray-300 text-gray-500 hover:border-primary'}`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Recent Documents</h3>
-              <button onClick={() => changeView('documents')} className="text-[#7C3AED] text-sm font-bold hover:underline">View All</button>
-            </div>
-            <div className="space-y-4">
-              {mockDocuments.slice(0, 3).map(doc => (
-                <div key={doc.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0F0A1E] rounded-xl border border-gray-200 dark:border-[#3D2A7A]">
-                  <div className="flex items-center gap-3">
-                    <FileText className="text-[#7C3AED]" />
-                    <div>
-                      <div className="font-bold text-sm">{doc.name}</div>
-                      <div className="text-xs text-gray-500">{doc.date}</div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold">Child Name</label>
+                      <input type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="e.g. Rahul" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-sm font-semibold">Age / Grade</label>
+                      <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
+                        <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Age</option>
+                        {[3,4,5,6,7,8,9,10,11,12,13,14,15].map(a => <option key={a} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{a} Years</option>)}
+                      </select>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-r from-[#7C3AED] to-[#A78BFA] p-8 rounded-3xl text-white shadow-lg">
-          <h2 className="text-3xl font-extrabold mb-2">Good morning, Dr. Educator 👋</h2>
-          <p className="opacity-90">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Total Clients', val: 12, icon: Users, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-            { label: 'Appts Today', val: 3, icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30' },
-            { label: 'Docs Generated', val: 24, icon: FileText, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
-            { label: 'Pending Steps', val: 1, icon: AlertCircle, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }
-          ].map((stat, i) => (
-            <div key={i} className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-              <div className={`${stat.bg} ${stat.color} w-12 h-12 rounded-xl flex items-center justify-center mb-4`}>
-                <stat.icon size={24} />
-              </div>
-              <div className="text-3xl font-black"><AnimatedNumber end={stat.val} /></div>
-              <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <h3 className="text-xl font-bold mb-6">Today's Schedule</h3>
-            <div className="space-y-4">
-              {mockAppointments.map(apt => (
-                <div key={apt.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-[#0F0A1E] rounded-xl border border-gray-200 dark:border-[#3D2A7A]">
-                  <div className="flex items-center gap-4">
-                    <div className="font-bold text-lg w-20">{apt.time}</div>
-                    <div className="w-1 h-10 bg-[#7C3AED] rounded-full"></div>
-                    <div>
-                      <div className="font-bold">{apt.name}</div>
-                      <div className="text-xs bg-[#EDE9FE] text-[#7C3AED] px-2 py-1 rounded-md inline-block mt-1">{apt.mode} Session</div>
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold">Primary Diagnosis / Need</label>
+                    <select className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-gray-900 dark:text-white">
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="">Select Condition</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Autism Spectrum Disorder</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">ADHD</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Down Syndrome</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Learning Disability</option>
+                      <option className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Speech Delay</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Select Focus Areas <span className="text-xs font-normal text-primary bg-primary/10 px-2 py-0.5 rounded ml-2">Zero Prompting</span></label>
+                    <div className="flex flex-wrap gap-2">
+                      {toolGoals.map(goal => (
+                        <button 
+                          key={goal}
+                          onClick={() => toggleGoal(goal)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedGoals.includes(goal) ? 'bg-primary text-white shadow-md scale-105' : 'bg-gray-100 dark:bg-darkBgAlt text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                        >
+                          {goal}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <button className="px-4 py-2 bg-[#7C3AED] text-white text-sm font-bold rounded-lg shadow-sm">Start</button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <h3 className="text-xl font-bold mb-6">Quick Actions</h3>
-            <div className="space-y-3">
-              <button onClick={() => changeView('tools')} className="w-full flex items-center gap-3 p-4 bg-[#F9F7FF] dark:bg-[#1A1033] rounded-xl border border-gray-200 dark:border-[#3D2A7A] hover:border-[#7C3AED] transition-all font-bold">
-                <FilePlus className="text-[#7C3AED]" /> New Assessment
-              </button>
-              <button onClick={() => changeView('tools')} className="w-full flex items-center gap-3 p-4 bg-[#F9F7FF] dark:bg-[#1A1033] rounded-xl border border-gray-200 dark:border-[#3D2A7A] hover:border-[#7C3AED] transition-all font-bold">
-                <Wrench className="text-[#7C3AED]" /> Generate IEP
-              </button>
-              <button onClick={() => changeView('clients')} className="w-full flex items-center gap-3 p-4 bg-[#F9F7FF] dark:bg-[#1A1033] rounded-xl border border-gray-200 dark:border-[#3D2A7A] hover:border-[#7C3AED] transition-all font-bold">
-                <UserPlus className="text-[#7C3AED]" /> Add Client
+                </>
+              )}
+              <button 
+                onClick={handleGenerate}
+                className="w-full bg-primary hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 animate-pulse-glow"
+              >
+                <Brain size={20} className="animate-bounce" />
+                {activeTool === 'M-CHAT Assessment' ? 'Calculate & Generate Report' : `Generate ${activeTool}`}
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-// ==========================================
-// VIEW: FIND PROFESSIONALS
-// ==========================================
-function FindProfessionals() {
-  const [search, setSearch] = useState('');
-  return (
-    <div className="space-y-6">
-      <div className="bg-white dark:bg-[#1E1244] p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] flex flex-wrap gap-4 items-center">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-3 text-gray-400" size={18} />
-          <input type="text" placeholder="Search by name..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none focus:border-[#7C3AED]" />
-        </div>
-        <select className="px-4 py-2.5 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none">
-          <option value="">All Departments</option>
-          <option>Special Education</option>
-          <option>Speech-Language Therapy</option>
-          <option>Psychology</option>
-          <option>Occupational Therapy</option>
-        </select>
-        <select className="px-4 py-2.5 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none">
-          <option value="">All Cities</option>
-          <option>Mumbai</option>
-          <option>Delhi</option>
-          <option>Bangalore</option>
-        </select>
-        <button className="bg-[#7C3AED] text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:bg-[#6D28D9] transition-colors">Apply Filters</button>
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockProfessionals.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map(p => (
-          <div key={p.id} className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] flex flex-col">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#7C3AED] to-[#A78BFA] text-white flex items-center justify-center font-bold text-xl">{p.name[0]}</div>
-              <div>
-                <h3 className="font-bold text-lg flex items-center gap-1">{p.name} <CheckCircle size={16} className="text-green-500" /></h3>
-                <span className="text-xs bg-[#EDE9FE] text-[#7C3AED] px-2 py-1 rounded-md font-bold">{p.dept}</span>
-              </div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-6 flex-1">
-              <div className="flex items-center gap-2"><User size={16} /> {p.qual}</div>
-              <div className="flex items-center gap-2"><MapPin size={16} /> {p.city} (Online & In-Person)</div>
-              <div className="flex items-center gap-2 text-yellow-500 font-bold"><Star size={16} fill="currentColor" /> {p.rating} ({p.reviews} reviews)</div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-auto">
-              <button className="border-2 border-[#7C3AED] text-[#7C3AED] font-bold py-2 rounded-xl hover:bg-[#EDE9FE] dark:hover:bg-[#1A1033] transition-colors">View Profile</button>
-              <button className="bg-[#7C3AED] text-white font-bold py-2 rounded-xl shadow-md hover:bg-[#6D28D9] transition-colors">Book Now</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: APPOINTMENTS
-// ==========================================
-function Appointments({ userRole, showToast }) {
-  const [tab, setTab] = useState('Upcoming');
-  const filtered = mockAppointments.filter(a => tab === 'Upcoming' ? ['Upcoming', 'Pending'].includes(a.status) : a.status === tab);
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex bg-white dark:bg-[#1E1244] p-1 rounded-xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-          {['Upcoming', 'Completed', 'Cancelled'].map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${tab === t ? 'bg-[#7C3AED] text-white shadow-md' : 'text-gray-500'}`}>{t}</button>
-          ))}
-        </div>
-        <button className="bg-[#7C3AED] text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:bg-[#6D28D9] flex items-center gap-2">
-          <Plus size={18} /> Book New
-        </button>
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="bg-white dark:bg-[#1E1244] rounded-3xl p-12 text-center border border-gray-100 dark:border-[#3D2A7A]">
-          <Calendar size={64} className="mx-auto text-gray-300 dark:text-[#3D2A7A] mb-4" />
-          <h3 className="text-xl font-bold mb-2">No {tab} Appointments</h3>
-          <p className="text-gray-500">You don't have any appointments in this category.</p>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map(apt => (
-            <div key={apt.id} className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] flex flex-col">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#EDE9FE] dark:bg-[#1A1033] text-[#7C3AED] rounded-full flex items-center justify-center font-bold text-lg">{apt.name[0]}</div>
-                  <div>
-                    <div className="font-bold">{apt.name}</div>
-                    <div className="text-xs text-gray-500">{apt.type}</div>
-                  </div>
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-md font-bold ${apt.status==='Upcoming'?'bg-blue-100 text-blue-600':apt.status==='Completed'?'bg-green-100 text-green-600':apt.status==='Pending'?'bg-yellow-100 text-yellow-600':'bg-red-100 text-red-600'}`}>{apt.status}</span>
-              </div>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
-                <div className="flex items-center gap-2"><Calendar size={16} /> {apt.date}</div>
-                <div className="flex items-center gap-2"><Clock size={16} /> {apt.time} ({apt.duration})</div>
-                <div className="flex items-center gap-2"><Video size={16} /> {apt.mode} Session</div>
-              </div>
-              <div className="mt-auto flex gap-2">
-                {['Upcoming', 'Pending'].includes(apt.status) && (
-                  <>
-                    <button className="flex-1 bg-[#7C3AED] text-white font-bold py-2 rounded-xl text-sm">Join</button>
-                    <button className="flex-1 border border-gray-200 dark:border-[#3D2A7A] font-bold py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-[#1A1033]">Reschedule</button>
-                  </>
-                )}
-                {apt.status === 'Completed' && (
-                  <button className="w-full border border-gray-200 dark:border-[#3D2A7A] font-bold py-2 rounded-xl text-sm hover:bg-gray-50 dark:hover:bg-[#1A1033]">View Notes</button>
-                )}
-                {apt.status === 'Cancelled' && (
-                  <button className="w-full bg-[#7C3AED] text-white font-bold py-2 rounded-xl text-sm">Rebook</button>
-                )}
-              </div>
-            </div>
-          ))}
         </div>
       )}
-    </div>
-  );
-}
 
-// ==========================================
-// VIEW: DOCUMENTS
-// ==========================================
-function Documents() {
-  const [view, setView] = useState('grid');
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="flex gap-4">
-          <input type="text" placeholder="Search documents..." className="px-4 py-2 rounded-xl border bg-white dark:bg-[#1E1244] border-gray-200 dark:border-[#3D2A7A] outline-none min-w-[250px]" />
-          <button className="p-2 bg-white dark:bg-[#1E1244] border border-gray-200 dark:border-[#3D2A7A] rounded-xl"><Filter size={20}/></button>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex bg-white dark:bg-[#1E1244] p-1 rounded-xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <button onClick={() => setView('grid')} className={`px-4 py-1.5 rounded-lg font-bold text-sm ${view === 'grid' ? 'bg-[#7C3AED] text-white' : 'text-gray-500'}`}>Grid</button>
-            <button onClick={() => setView('list')} className={`px-4 py-1.5 rounded-lg font-bold text-sm ${view === 'list' ? 'bg-[#7C3AED] text-white' : 'text-gray-500'}`}>List</button>
-          </div>
-          <button className="bg-[#7C3AED] text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:bg-[#6D28D9] flex items-center gap-2">
-            <Plus size={18} /> New Doc
-          </button>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {mockDocuments.map(doc => (
-          <div key={doc.id} className="bg-white dark:bg-[#1E1244] p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] group hover:border-[#7C3AED] transition-colors cursor-pointer">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${doc.type==='IEP'?'bg-purple-100 text-purple-600':doc.type==='Assessment'?'bg-blue-100 text-blue-600':'bg-green-100 text-green-600'}`}>
-              <FileText size={24} />
-            </div>
-            <h4 className="font-bold mb-1 truncate" title={doc.name}>{doc.name}</h4>
-            <div className="text-xs font-bold text-gray-500 mb-4">{doc.type} • {doc.child}</div>
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-[#3D2A7A]">
-              <span className="text-xs text-gray-400">{doc.date}</span>
-              <div className="flex gap-2">
-                <button className="p-1.5 text-gray-400 hover:text-[#7C3AED] bg-gray-50 dark:bg-[#1A1033] rounded-lg"><Eye size={16} /></button>
-                <button className="p-1.5 text-gray-400 hover:text-[#7C3AED] bg-gray-50 dark:bg-[#1A1033] rounded-lg"><Download size={16} /></button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: ONBOARDING
-// ==========================================
-function Onboarding() {
-  const [step, setStep] = useState(1);
-  const steps = ["Basic Info", "Credentials", "Services", "Uploads", "Submit"];
-  
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex items-center justify-between relative before:absolute before:inset-0 before:top-1/2 before:-translate-y-1/2 before:h-1 before:bg-gray-200 dark:before:bg-[#3D2A7A] before:-z-10">
-        {steps.map((s, i) => (
-          <div key={i} className="flex flex-col items-center gap-2 bg-[#F9F7FF] dark:bg-[#0F0A1E] px-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-[#F9F7FF] dark:border-[#0F0A1E] ${step > i+1 ? 'bg-green-500 text-white' : step === i+1 ? 'bg-[#7C3AED] text-white shadow-[0_0_0_4px_rgba(124,58,237,0.2)]' : 'bg-gray-200 dark:bg-[#3D2A7A] text-gray-500'}`}>
-              {step > i+1 ? <CheckCircle size={20} /> : i+1}
-            </div>
-            <span className={`text-xs font-bold ${step === i+1 ? 'text-[#7C3AED]' : 'text-gray-500'}`}>{s}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-white dark:bg-[#1E1244] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-        {step === 1 && (
-          <div className="space-y-6 animate-in slide-in-from-right-4">
-            <h3 className="text-2xl font-bold border-b border-gray-100 dark:border-[#3D2A7A] pb-4">Basic Information</h3>
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-[#1A1033] border-2 border-dashed border-gray-300 dark:border-[#3D2A7A] flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#7C3AED] hover:text-[#7C3AED] transition-colors">
-                <Upload size={24} className="mb-1" />
-                <span className="text-xs font-bold">Photo</span>
-              </div>
-              <div className="flex-1 space-y-4">
-                <div><label className="text-sm font-bold block mb-1">Full Name</label><input type="text" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" defaultValue="Dr. Educator" /></div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div><label className="text-sm font-bold block mb-1">City</label><input type="text" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-              <div><label className="text-sm font-bold block mb-1">Languages</label><input type="text" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" placeholder="English, Hindi..." /></div>
-            </div>
-            <div><label className="text-sm font-bold block mb-1">Bio</label><textarea rows="4" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none"></textarea></div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-6 animate-in slide-in-from-right-4">
-            <h3 className="text-2xl font-bold border-b border-gray-100 dark:border-[#3D2A7A] pb-4">Professional Credentials</h3>
-            <div className="grid grid-cols-2 gap-6">
-              <div><label className="text-sm font-bold block mb-1">Specialization</label><select className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none"><option>Special Education</option></select></div>
-              <div><label className="text-sm font-bold block mb-1">Highest Qualification</label><input type="text" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-              <div><label className="text-sm font-bold block mb-1">Registration Number</label><input type="text" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-              <div><label className="text-sm font-bold block mb-1">Years of Experience</label><input type="number" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-            </div>
-          </div>
-        )}
-
-        {step > 2 && (
-          <div className="text-center py-12 animate-in fade-in">
-            <CheckCircle size={64} className="mx-auto text-green-500 mb-6" />
-            <h3 className="text-2xl font-bold mb-2">Step {step} Simulation</h3>
-            <p className="text-gray-500">In a full backend setup, this would save to the profiles table.</p>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-100 dark:border-[#3D2A7A]">
-          <button onClick={() => setStep(Math.max(1, step-1))} disabled={step === 1} className="px-6 py-3 font-bold text-gray-500 disabled:opacity-30">Back</button>
-          <button onClick={() => setStep(Math.min(5, step+1))} className="px-8 py-3 bg-[#7C3AED] text-white font-bold rounded-xl shadow-md hover:bg-[#6D28D9] transition-all">
-            {step === 5 ? 'Submit Profile' : 'Next Step'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: CLIENTS
-// ==========================================
-function Clients() {
-  return (
-    <div className="space-y-6">
-      <div className="flex gap-4">
-        <input type="text" placeholder="Search clients..." className="flex-1 px-4 py-3 rounded-xl border bg-white dark:bg-[#1E1244] border-gray-200 dark:border-[#3D2A7A] outline-none" />
-        <button className="bg-[#7C3AED] text-white font-bold px-6 py-3 rounded-xl shadow-md hover:bg-[#6D28D9] flex items-center gap-2">
-          <UserPlus size={18} /> Add Client
-        </button>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {mockClients.map(c => (
-          <div key={c.id} className="bg-white dark:bg-[#1E1244] p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl">{c.name[0]}</div>
-              <div>
-                <h3 className="font-bold text-lg">{c.name} ({c.age})</h3>
-                <span className="text-xs bg-gray-100 dark:bg-[#1A1033] px-2 py-1 rounded-md font-bold">{c.condition}</span>
-              </div>
-            </div>
-            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
-              <div><strong>Parent:</strong> {c.parent}</div>
-              <div><strong>Last Session:</strong> {c.lastSession}</div>
-              <div><strong>Total Sessions:</strong> {c.sessions}</div>
-            </div>
-            <div className="flex gap-2">
-              <button className="flex-1 border-2 border-[#7C3AED] text-[#7C3AED] font-bold py-2 rounded-xl text-sm">View Profile</button>
-              <button className="flex-1 bg-[#7C3AED] text-white font-bold py-2 rounded-xl text-sm">Add Note</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: TOOLS
-// ==========================================
-function Tools({ showToast }) {
-  const tools = [
-    { title: "M-CHAT Assessment", desc: "Interactive screening tool for autism risk in toddlers.", icon: FileText, color: "bg-blue-500" },
-    { title: "IEP Generator", desc: "Create complete Individualized Education Programs.", icon: FilePlus, color: "bg-purple-500" },
-    { title: "ITP Generator", desc: "Build Individual Transition Plans for older students.", icon: Shield, color: "bg-orange-500" },
-    { title: "Lesson Plan Builder", desc: "Weekly differentiated lesson plans tailored to conditions.", icon: Calendar, color: "bg-green-500" },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-r from-[#1A1033] to-[#3D2A7A] p-10 rounded-3xl text-white shadow-xl flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-extrabold mb-2">Professional AI Tools</h2>
-          <p className="opacity-80 max-w-lg text-lg">Streamline your workflow with AI-powered document generation designed specifically for special educators in India.</p>
-        </div>
-        <Wrench size={80} className="opacity-20 hidden md:block" />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {tools.map((t, i) => (
-          <div key={i} className="bg-white dark:bg-[#1E1244] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] hover:border-[#7C3AED] transition-colors group cursor-pointer" onClick={() => showToast('Opening ' + t.title + ' simulator...', 'success')}>
-            <div className={`${t.color} w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-              <t.icon size={32} />
-            </div>
-            <h3 className="text-2xl font-bold mb-3">{t.title}</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-8">{t.desc}</p>
-            <button className="text-[#7C3AED] font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
-              Open Tool <ChevronRight size={20} />
+      {/* SIGNUP MODAL */}
+      {showSignup && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-darkCard w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative animate-slide-up">
+            <button onClick={() => setShowSignup(false)} className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-darkBg rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+              <X size={20} />
             </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: MESSAGES
-// ==========================================
-function Messages() {
-  const [activeChat, setActiveChat] = useState(mockConversations[0]);
-  return (
-    <div className="flex h-[calc(100vh-8rem)] bg-white dark:bg-[#1E1244] rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] overflow-hidden">
-      <div className="w-1/3 border-r border-gray-100 dark:border-[#3D2A7A] flex flex-col">
-        <div className="p-4 border-b border-gray-100 dark:border-[#3D2A7A]">
-          <input type="text" placeholder="Search chats..." className="w-full bg-gray-50 dark:bg-[#0F0A1E] px-4 py-2.5 rounded-xl outline-none" />
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          {mockConversations.map(c => (
-            <div key={c.id} onClick={() => setActiveChat(c)} className={`p-4 border-b border-gray-50 dark:border-[#1A1033] cursor-pointer flex gap-4 transition-colors ${activeChat?.id === c.id ? 'bg-[#F9F7FF] dark:bg-[#3D2A7A]/30' : 'hover:bg-gray-50 dark:hover:bg-[#1A1033]'}`}>
-              <div className="w-12 h-12 bg-[#EDE9FE] dark:bg-[#3D2A7A] text-[#7C3AED] rounded-full flex items-center justify-center font-bold flex-shrink-0">{c.name[0]}</div>
-              <div className="flex-1 overflow-hidden">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold truncate">{c.name}</span>
-                  <span className="text-xs text-gray-400">{c.time}</span>
-                </div>
-                <div className="text-sm text-gray-500 truncate">{c.preview}</div>
+            <div className="p-8">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Brain className="h-8 w-8 text-primary" />
               </div>
-              {c.unread > 0 && <div className="w-5 h-5 bg-[#7C3AED] text-white text-xs rounded-full flex items-center justify-center font-bold">{c.unread}</div>}
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-[#0F0A1E]">
-        <div className="p-4 bg-white dark:bg-[#1E1244] border-b border-gray-100 dark:border-[#3D2A7A] flex items-center gap-4">
-          <div className="w-10 h-10 bg-[#EDE9FE] dark:bg-[#3D2A7A] text-[#7C3AED] rounded-full flex items-center justify-center font-bold">{activeChat?.name[0]}</div>
-          <h3 className="font-bold">{activeChat?.name}</h3>
-        </div>
-        <div className="flex-1 p-6 overflow-y-auto space-y-6">
-          <div className="flex justify-start">
-            <div className="bg-white dark:bg-[#1E1244] p-4 rounded-2xl rounded-tl-none max-w-[70%] shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-              Hello! This is a mock chat history.
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <div className="bg-[#7C3AED] text-white p-4 rounded-2xl rounded-tr-none max-w-[70%] shadow-sm">
-              Great, thank you!
-            </div>
-          </div>
-          <div className="flex justify-start">
-            <div className="bg-white dark:bg-[#1E1244] p-4 rounded-2xl rounded-tl-none max-w-[70%] shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-              {activeChat?.preview}
-            </div>
-          </div>
-        </div>
-        <div className="p-4 bg-white dark:bg-[#1E1244] border-t border-gray-100 dark:border-[#3D2A7A] flex gap-2">
-          <button className="p-3 text-gray-400 hover:text-[#7C3AED] bg-gray-50 dark:bg-[#0F0A1E] rounded-xl"><Paperclip size={20} /></button>
-          <input type="text" placeholder="Type a message..." className="flex-1 bg-gray-50 dark:bg-[#0F0A1E] px-4 py-3 rounded-xl outline-none" />
-          <button className="p-3 bg-[#7C3AED] text-white rounded-xl shadow-md hover:bg-[#6D28D9]"><Send size={20} /></button>
-        </div>
-      </div>
-    </div>
-  );
-}
+              <h3 className="text-2xl font-bold mb-2 text-center">
+                {authMode === 'login' ? 'Welcome Back' : authMode === 'signup' ? 'Create Account' : 'Reset Password'}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 text-center text-sm">
+                {authMode === 'login' ? 'Sign in to access your saved documents.' : authMode === 'signup' ? 'Sign up to generate and save documents.' : 'Enter your email to get a reset link.'}
+              </p>
+              
+              {authError && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{authError}</div>}
+              {authMsg && <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4">{authMsg}</div>}
 
-// ==========================================
-// VIEW: NOTIFICATIONS
-// ==========================================
-function Notifications() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Notifications</h2>
-        <button className="text-[#7C3AED] font-bold text-sm hover:underline">Mark all as read</button>
-      </div>
-      <div className="bg-white dark:bg-[#1E1244] rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] overflow-hidden">
-        {mockNotifications.map(n => (
-          <div key={n.id} className={`p-6 border-b border-gray-50 dark:border-[#3D2A7A] flex gap-4 ${n.unread ? 'bg-[#F9F7FF] dark:bg-[#3D2A7A]/20' : ''}`}>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${n.type==='Appointment'?'bg-blue-100 text-blue-600':n.type==='Document'?'bg-purple-100 text-purple-600':n.type==='Message'?'bg-orange-100 text-orange-600':'bg-gray-100 text-gray-600'}`}>
-              <Bell size={24} />
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between mb-1">
-                <h4 className="font-bold text-lg">{n.title}</h4>
-                <span className="text-xs text-gray-400">{n.time}</span>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400">{n.desc}</p>
-            </div>
-            {n.unread && <div className="w-3 h-3 bg-[#7C3AED] rounded-full mt-2"></div>}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// VIEW: SETTINGS
-// ==========================================
-function SettingsView({ showToast }) {
-  const [tab, setTab] = useState('Profile');
-  const [pass, setPass] = useState('');
-  
-  const getStrength = (p) => {
-    if(p.length === 0) return { label: '', color: 'bg-gray-200' };
-    if(p.length < 6) return { label: 'Weak', color: 'bg-red-500 w-1/3' };
-    if(p.length < 10) return { label: 'Fair', color: 'bg-yellow-500 w-2/3' };
-    return { label: 'Strong', color: 'bg-green-500 w-full' };
-  };
-  const strength = getStrength(pass);
-
-  return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex bg-white dark:bg-[#1E1244] p-1 rounded-xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] mb-8 overflow-x-auto">
-        {['Profile', 'Security', 'Notifications', 'Privacy'].map(t => (
-          <button key={t} onClick={() => setTab(t)} className={`flex-1 px-6 py-3 rounded-lg font-bold text-sm transition-all whitespace-nowrap ${tab === t ? 'bg-[#7C3AED] text-white shadow-md' : 'text-gray-500'}`}>{t}</button>
-        ))}
-      </div>
-
-      <div className="bg-white dark:bg-[#1E1244] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A]">
-        {tab === 'Profile' && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold border-b border-gray-100 dark:border-[#3D2A7A] pb-4">Profile Information</h3>
-            <div className="flex items-center gap-6 mb-6">
-              <div className="w-20 h-20 bg-[#7C3AED] text-white rounded-full flex items-center justify-center text-3xl font-bold">JD</div>
-              <button className="border-2 border-[#7C3AED] text-[#7C3AED] font-bold px-4 py-2 rounded-xl">Change Photo</button>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div><label className="text-sm font-bold block mb-1">Full Name</label><input type="text" defaultValue="John Doe" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-              <div><label className="text-sm font-bold block mb-1">Email</label><input type="email" defaultValue="john@example.com" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" /></div>
-              <div className="md:col-span-2"><label className="text-sm font-bold block mb-1">Bio</label><textarea rows="3" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none"></textarea></div>
-            </div>
-            <button onClick={() => showToast('Profile saved!', 'success')} className="bg-[#7C3AED] text-white font-bold px-8 py-3 rounded-xl shadow-md mt-4">Save Changes</button>
-          </div>
-        )}
-
-        {tab === 'Security' && (
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-xl font-bold border-b border-gray-100 dark:border-[#3D2A7A] pb-4 mb-6">Change Password</h3>
-              <div className="space-y-4 max-w-md">
-                <input type="password" placeholder="Current Password" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" />
+              <form onSubmit={handleAuth} className="space-y-4">
+                {authMode === 'signup' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-semibold block mb-1">Full Name</label>
+                      <input required value={authName} onChange={e => setAuthName(e.target.value)} type="text" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 outline-none" placeholder="Your Name" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold block mb-1">I am a...</label>
+                      <select value={authRole} onChange={e => setAuthRole(e.target.value)} className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 outline-none">
+                        <option value="Parent">Parent</option>
+                        <option value="Professional">Professional</option>
+                      </select>
+                    </div>
+                  </>
+                )}
                 <div>
-                  <input type="password" placeholder="New Password" value={pass} onChange={e=>setPass(e.target.value)} className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" />
-                  <div className="mt-2 h-1.5 w-full bg-gray-200 dark:bg-[#3D2A7A] rounded-full overflow-hidden flex">
-                    <div className={`h-full transition-all ${strength.color}`}></div>
-                  </div>
-                  <div className="text-xs font-bold text-gray-500 mt-1 text-right">{strength.label}</div>
+                  <label className="text-sm font-semibold block mb-1">Email Address</label>
+                  <input required value={authEmail} onChange={e => setAuthEmail(e.target.value)} type="email" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 outline-none" placeholder="your@email.com" />
                 </div>
-                <input type="password" placeholder="Confirm New Password" className="w-full px-4 py-3 rounded-xl border bg-gray-50 dark:bg-[#0F0A1E] border-gray-200 dark:border-[#3D2A7A] outline-none" />
-                <button onClick={() => { if(pass.length>5) { showToast('Password updated successfully ✅', 'success'); setPass(''); } else showToast('Password too weak', 'error'); }} className="bg-[#7C3AED] text-white font-bold px-8 py-3 rounded-xl shadow-md w-full">Update Password</button>
+                {authMode !== 'reset' && (
+                  <div>
+                    <label className="text-sm font-semibold block mb-1">Password</label>
+                    <input required value={authPassword} onChange={e => setAuthPassword(e.target.value)} type="password" minLength="6" className="w-full bg-gray-50 dark:bg-darkBg border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 focus:border-primary focus:ring-1 outline-none" placeholder="Min 6 characters" />
+                  </div>
+                )}
+                
+                <button disabled={authLoading} type="submit" className="w-full bg-primary hover:bg-purple-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl shadow-lg transition-all mt-2 btn-animated">
+                  {authLoading ? 'Processing...' : authMode === 'login' ? 'Log In' : authMode === 'signup' ? 'Sign Up' : 'Send Reset Link'}
+                </button>
+              </form>
+
+              {authMode !== 'reset' && (
+                <>
+                  <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+                    <span className="px-4 text-sm text-gray-500 dark:text-gray-400">or</span>
+                    <div className="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+                  </div>
+                  
+                  <button 
+                    onClick={handleGoogleSignIn}
+                    disabled={authLoading}
+                    className="w-full flex items-center justify-center gap-3 bg-white dark:bg-darkBg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-white font-bold py-3 rounded-xl transition-all shadow-sm"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    Continue with Google
+                  </button>
+                </>
+              )}
+
+              <div className="mt-6 text-center text-sm space-y-2">
+                {authMode === 'login' ? (
+                  <>
+                    <p><button onClick={() => setAuthMode('reset')} className="text-primary hover:underline">Forgot password?</button></p>
+                    <p>Don't have an account? <button onClick={() => setAuthMode('signup')} className="text-primary font-bold hover:underline">Sign up</button></p>
+                  </>
+                ) : authMode === 'signup' ? (
+                  <p>Already have an account? <button onClick={() => setAuthMode('login')} className="text-primary font-bold hover:underline">Log in</button></p>
+                ) : (
+                  <p>Remember your password? <button onClick={() => setAuthMode('login')} className="text-primary font-bold hover:underline">Log in</button></p>
+                )}
               </div>
             </div>
-            
-            <div>
-              <h3 className="text-xl font-bold border-b border-gray-100 dark:border-[#3D2A7A] pb-4 mb-6 text-red-500">Danger Zone</h3>
-              <button onClick={() => showToast('Sessions revoked.', 'info')} className="border-2 border-red-500 text-red-500 font-bold px-6 py-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">Log out of all devices</button>
+          </div>
+        </div>
+      )}
+
+      {/* GENERATED DOCUMENT VIEWER */}
+      {generatedDocument && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-darkCard w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col relative animate-slide-up">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-darkBgAlt rounded-t-3xl">
+              <h3 className="text-xl font-bold text-primary flex items-center gap-2"><CheckCircle /> Document Ready</h3>
+              <button onClick={() => setGeneratedDocument(null)} className="p-2 bg-gray-200 dark:bg-gray-800 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-8 bg-gray-100 dark:bg-[#0A0514]">
+              {/* This is the printable area */}
+              <div id="printable-document" className="bg-white text-black p-10 shadow-lg min-h-full max-w-3xl mx-auto border border-gray-200" dangerouslySetInnerHTML={{ __html: generatedDocument.content }}></div>
+            </div>
+            <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex flex-wrap gap-4 justify-end bg-gray-50 dark:bg-darkBgAlt rounded-b-3xl">
+              <button onClick={() => {
+                const blob = new Blob(['\\ufeff', generatedDocument.content], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `${generatedDocument.title}.doc`; a.click();
+                URL.revokeObjectURL(url);
+              }} className="px-6 py-3 bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white font-bold rounded-xl btn-animated shadow-lg transition-all">
+                Download .DOC
+              </button>
+              <button onClick={() => window.print()} className="px-6 py-3 bg-primary hover:bg-purple-700 text-white font-bold rounded-xl btn-animated shadow-lg">
+                Download PDF
+              </button>
             </div>
           </div>
-        )}
-
-        {(tab === 'Notifications' || tab === 'Privacy') && (
-          <div className="text-center py-12 text-gray-500">
-            <Settings size={48} className="mx-auto mb-4 opacity-50" />
-            <p>Mock toggle settings for {tab} would appear here.</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
