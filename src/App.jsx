@@ -361,7 +361,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <a href="#" className="flex items-center gap-2">
-              <Brain className="text-primary h-8 w-8" />
+              <img src="/SIMPLYLOGO.png" alt="SimplyAbled Logo" className="h-8 md:h-10 object-contain" />
               <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
                 SimplyAbled
               </span>
