@@ -4,7 +4,7 @@ import {
   Menu, Search, Moon, Sun, ChevronLeft, ChevronRight, CheckCircle, Clock, 
   X, Upload, Plus, Download, Edit, Star, MapPin, Video, User, Lock, Eye, 
   EyeOff, Shield, Trash2, ArrowRight, Activity, BookOpen, CheckSquare, 
-  Filter, MoreVertical, Paperclip, Send, Folder
+  Filter, MoreVertical, Paperclip, Send, Folder, FileCheck, Check
 } from 'lucide-react';
 
 // --- MOCK DATA ---
@@ -271,7 +271,7 @@ const FindProfessionals = () => {
       {/* Filters */}
       <div className="bg-white dark:bg-[#1E1244] p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="relative col-span-1 md:col-span-2">
-          <SearchIcon className="absolute left-3 top-3 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
           <input 
             type="text" placeholder="Search by name..." 
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-xl outline-none focus:border-primary text-gray-900 dark:text-white"
@@ -391,7 +391,7 @@ const MyDocuments = () => {
 
       <div className="bg-white dark:bg-[#1E1244] p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] flex gap-4">
         <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-3 text-gray-400" size={20} />
+          <Search className="absolute left-3 top-3 text-gray-400" size={20} />
           <input type="text" placeholder="Search documents..." className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-xl outline-none focus:border-primary text-gray-900 dark:text-white" />
         </div>
         <select className="px-4 py-2 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-xl outline-none focus:border-primary text-gray-900 dark:text-white hidden md:block">
@@ -574,7 +574,7 @@ const Messages = () => (
     <div className="w-full md:w-1/3 border-r border-gray-100 dark:border-[#3D2A7A] flex flex-col h-full">
       <div className="p-4 border-b border-gray-100 dark:border-[#3D2A7A]">
         <div className="relative">
-          <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           <input type="text" placeholder="Search messages..." className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-lg outline-none focus:border-primary text-sm text-gray-900 dark:text-white" />
         </div>
       </div>
@@ -866,7 +866,7 @@ export default function Dashboard({ session, userProfile, supabase, onClose, onL
           
           <div className="flex items-center gap-2 md:gap-4">
             <div className="hidden md:flex relative group">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input type="text" placeholder="Search..." className="w-48 lg:w-64 pl-9 pr-4 py-2 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-full outline-none focus:border-primary text-sm transition-all focus:w-64 lg:focus:w-80 dark:text-white" />
             </div>
             
