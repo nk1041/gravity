@@ -725,10 +725,30 @@ const AccountSettings = () => {
 // --- MAIN DASHBOARD LAYOUT ---
 export default function Dashboard({ session, userProfile, supabase, onClose, onLogout }) {
   const [activeView, setActiveView] = useState('overview');
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
   const [isDarkMode, setIsDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
 
   const role = userProfile?.role || 'Parent';
+
+  // Mobile Back Button Optimization for Dashboard
+  useEffect(() => {
+    window.history.pushState({ view: activeView, dashboard: true }, '');
+  }, [activeView]);
+
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (isSidebarOpen && window.innerWidth < 768) {
+        setSidebarOpen(false);
+        window.history.pushState({ view: activeView, dashboard: true }, '');
+      } else if (e.state && e.state.dashboard && e.state.view) {
+        setActiveView(e.state.view);
+      } else {
+        onClose();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isSidebarOpen, activeView, onClose]);
 
   const toggleDarkMode = () => {
     const isDark = !isDarkMode;
@@ -846,7 +866,7 @@ export default function Dashboard({ session, userProfile, supabase, onClose, onL
       </aside>
 
       {/* OVERLAY FOR MOBILE */}
-      {!isSidebarOpen && window.innerWidth < 768 && (
+      {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)}></div>
       )}
 

@@ -132,6 +132,24 @@ export default function App() {
     if (data) setUserProfile(data);
   };
 
+  // Mobile Back Button Optimization
+  useEffect(() => {
+    if (activeTool || showSignup || mobileMenuOpen || showDashboard) {
+      window.history.pushState({ modalOpen: true }, '');
+    }
+  }, [activeTool, showSignup, mobileMenuOpen, showDashboard]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (activeTool) setActiveTool(null);
+      if (showSignup) setShowSignup(false);
+      if (mobileMenuOpen) setMobileMenuOpen(false);
+      if (showDashboard) setShowDashboard(false);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeTool, showSignup, mobileMenuOpen, showDashboard]);
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthLoading(true); setAuthError(''); setAuthMsg('');
