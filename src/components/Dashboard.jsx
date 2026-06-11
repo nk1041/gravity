@@ -253,10 +253,46 @@ const FindProfessionals = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [deptFilter, setDeptFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
+
+  const locateMe = () => {
+    setIsLocating(true);
+    setLocationError('');
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser');
+      setIsLocating(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const { latitude, longitude } = position.coords;
+        // Using OpenStreetMap reverse geocoding
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await response.json();
+        const city = data.address.city || data.address.town || data.address.village || data.address.state_district;
+        
+        if (city) {
+          // Set search term to city name to filter
+          setSearchTerm(city.split(' ')[0]);
+        } else {
+          setLocationError('Could not determine city from coordinates');
+        }
+      } catch (err) {
+        setLocationError('Failed to retrieve location data');
+      }
+      setIsLocating(false);
+    }, (err) => {
+      setLocationError('Location permission denied');
+      setIsLocating(false);
+    });
+  };
   
   const filteredPros = indianProfessionals.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.city.toLowerCase().includes(searchTerm.toLowerCase());
     return (
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      matchesSearch &&
       (deptFilter === '' || p.dept === deptFilter) &&
       (cityFilter === '' || p.city === cityFilter)
     );
@@ -265,7 +301,14 @@ const FindProfessionals = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Find the Right Expert</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Find the Right Expert</h1>
+          {locationError && <p className="text-red-500 text-sm mt-1">{locationError}</p>}
+        </div>
+        <button onClick={locateMe} disabled={isLocating} className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors">
+          <MapPin size={18} />
+          {isLocating ? 'Locating...' : '📍 Find Near Me'}
+        </button>
       </div>
 
       {/* Filters */}
@@ -273,7 +316,7 @@ const FindProfessionals = () => {
         <div className="relative col-span-1 md:col-span-2">
           <Search className="absolute left-3 top-3 text-gray-400" size={20} />
           <input 
-            type="text" placeholder="Search by name..." 
+            type="text" placeholder="Search by name or city..." 
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-[#1A1033] border border-gray-200 dark:border-[#3D2A7A] rounded-xl outline-none focus:border-primary text-gray-900 dark:text-white"
             value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
           />
