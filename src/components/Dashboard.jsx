@@ -744,6 +744,8 @@ export default function Dashboard({ session, userProfile, supabase, onClose, onL
     { id: 'onboarding', label: 'Professional Profile', icon: Edit },
   ];
 
+  const links = role === 'Parent' ? parentLinks : educatorLinks;
+
   const renderView = () => {
     switch (activeView) {
       case 'overview': return <Overview role={role} profile={userProfile} changeView={setActiveView} supabase={supabase} session={session} />;
