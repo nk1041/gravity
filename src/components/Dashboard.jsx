@@ -25,7 +25,7 @@ const AnimatedNumber = ({ end, duration = 1000 }) => {
 
 const getInitials = (name) => {
   if (!name) return 'U';
-  return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  return String(name).split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 };
 
 const EmptyState = ({ icon: Icon, title, message, action }) => (
@@ -80,7 +80,7 @@ const Overview = ({ role, profile, changeView, supabase }) => {
         <div className="absolute top-0 right-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
           <Activity size={300} />
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Good morning, {profile?.full_name?.split(' ')[0] || 'User'} ðŸ‘‹</h1>
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">Good morning, {profile?.full_name ? profile.full_name.split(' ')[0] : 'User'} 👋</h1>
         <p className="text-purple-100 text-lg">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
       </div>
 
@@ -596,15 +596,15 @@ const EducatorTools = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Professional Tools</h1>
         <p className="text-gray-500 dark:text-gray-400">Streamline your documentation with our AI-powered templates.</p>
       </div>
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-4 md:gap-6">
         {tools.map((t, i) => (
-          <div key={i} className="bg-white dark:bg-[#1E1244] p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] hover:border-primary transition-all group cursor-pointer">
-            <div className={`w-16 h-16 rounded-2xl ${t.bg} ${t.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-              <t.icon size={32} />
+          <div key={i} className="bg-white dark:bg-[#1E1244] p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-[#3D2A7A] hover:border-primary transition-all group cursor-pointer">
+            <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl ${t.bg} ${t.color} flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform`}>
+              <t.icon className="w-7 h-7 md:w-8 md:h-8" />
             </div>
-            <h3 className="text-xl font-bold mb-3">{t.title}</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">{t.desc}</p>
-            <button className="flex items-center gap-2 text-primary font-bold hover:underline">
+            <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">{t.title}</h3>
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-4 md:mb-6">{t.desc}</p>
+            <button className="flex items-center gap-2 text-primary font-bold hover:underline text-sm md:text-base">
               Open Tool <ChevronRight size={18} />
             </button>
           </div>

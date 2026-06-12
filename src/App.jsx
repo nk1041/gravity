@@ -396,7 +396,7 @@ export default function App() {
               
               {session ? (
                 <div className="flex items-center gap-4">
-                  <span className="font-medium text-primary hidden lg:inline-block">Hi, {userProfile?.full_name?.split(' ')[0] || 'User'}</span>
+                  <span className="font-medium text-primary hidden lg:inline-block">Hi, {userProfile?.full_name ? userProfile.full_name.split(' ')[0] : 'User'}</span>
                   <button onClick={() => setShowDashboard(true)} className="font-bold text-primary hover:underline hidden sm:block">Dashboard</button>
                   <button onClick={handleLogout} className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-full font-medium transition-all">
                     Log out
@@ -438,7 +438,7 @@ export default function App() {
             <hr className="border-gray-200 dark:border-gray-700" />
             {session ? (
               <>
-                <div className="font-medium text-primary py-2">Hi, {userProfile?.full_name?.split(' ')[0] || 'User'}</div>
+                <div className="font-medium text-primary py-2">Hi, {userProfile?.full_name ? userProfile.full_name.split(' ')[0] : 'User'}</div>
                 <button onClick={() => { setShowDashboard(true); setMobileMenuOpen(false); }} className="w-full bg-primary text-white font-semibold py-2 rounded-lg text-center">Dashboard</button>
                 <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full border border-primary text-primary font-semibold py-2 rounded-lg text-center">Log Out</button>
               </>
