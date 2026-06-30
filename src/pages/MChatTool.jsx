@@ -101,19 +101,10 @@ const MChatTool = () => {
     const score = calculateScore();
     const result = getResult(score);
     
-    if (user) {
-      try {
-        await supabase.from('documents').insert({
-          user_id: user.id,
-          title: `M-CHAT - ${studentName}`,
-          type: 'M-CHAT',
-          content: `Score: ${score}/20\nRisk Level: ${result.risk}\n\n${result.text}`,
-          metadata: { studentName, dateOfBirth, score, answers }
-        });
-      } catch (dbError) {
-        console.error("Failed to save to database:", dbError);
-      }
-    }
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    const splitText = doc.splitTextToSize(result.text, 170);
+    doc.text(splitText, 20, 95);
     
     doc.setFontSize(22);
     doc.setTextColor(107, 70, 193); // Primary color
@@ -140,7 +131,45 @@ const MChatTool = () => {
     const splitText = doc.splitTextToSize(result.text, 170);
     doc.text(splitText, 20, 95);
     
-    doc.save(`M-CHAT_Report_${studentName.replace(/\\s+/g, '_')}.pdf`);
+    const fileName = `M-CHAT_Report_${studentName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`;
+
+    if (user) {
+      try {
+        const pdfBlob = doc.output('blob');
+        
+        // 1. Upload PDF to Storage Bucket
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(`${user.id}/${fileName}`, pdfBlob, {
+            contentType: 'application/pdf',
+            upsert: false
+          });
+          
+        let pdfUrl = null;
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('documents')
+            .getPublicUrl(`${user.id}/${fileName}`);
+          pdfUrl = publicUrl;
+        } else {
+          console.error("Storage upload error:", uploadError);
+        }
+
+        // 2. Insert record into Postgres with text AND pdf_url
+        await supabase.from('documents').insert({
+          user_id: user.id,
+          title: `M-CHAT - ${studentName}`,
+          type: 'M-CHAT',
+          content: `Score: ${score}/20\nRisk Level: ${result.risk}\n\n${result.text}`,
+          pdf_url: pdfUrl,
+          metadata: { studentName, dateOfBirth, score, answers }
+        });
+      } catch (dbError) {
+        console.error("Failed to save to database:", dbError);
+      }
+    }
+    
+    doc.save(fileName);
   };
 
   if (isSubmitted) {

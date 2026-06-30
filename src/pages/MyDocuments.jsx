@@ -114,7 +114,11 @@ const MyDocuments = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Download PDF"><Download size={18} /></button>
+                        {doc.pdf_url && (
+                          <button onClick={() => window.open(doc.pdf_url, '_blank')} className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Download PDF">
+                            <Download size={18} />
+                          </button>
+                        )}
                         <button onClick={() => deleteDocument(doc.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
                       </div>
                     </td>

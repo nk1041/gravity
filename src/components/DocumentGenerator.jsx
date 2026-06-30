@@ -180,14 +180,38 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         }
       }
       
-      // Save to database if user is logged in
+      const fileName = `SimplyAbled_${formData.type.toUpperCase()}_${new Date().getTime()}.pdf`;
+      
+      // Save to database and bucket if user is logged in
       if (user) {
         try {
+          const pdfBlob = doc.output('blob');
+          
+          // 1. Upload PDF to Storage Bucket
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(`${user.id}/${fileName}`, pdfBlob, {
+              contentType: 'application/pdf',
+              upsert: false
+            });
+            
+          let pdfUrl = null;
+          if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('documents')
+              .getPublicUrl(`${user.id}/${fileName}`);
+            pdfUrl = publicUrl;
+          } else {
+            console.error("Storage upload error:", uploadError);
+          }
+
+          // 2. Insert record into Postgres with raw text AND pdf_url
           await supabase.from('documents').insert({
             user_id: user.id,
             title: `${formData.type.toUpperCase()} - ${formData.initials.toUpperCase()}`,
             type: formData.type.toUpperCase(),
             content: generatedContent,
+            pdf_url: pdfUrl,
             metadata: formData
           });
         } catch (dbError) {
@@ -195,7 +219,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         }
       }
 
-      doc.save(`SimplyAbled_${formData.type.toUpperCase()}_${new Date().getTime()}.pdf`);
+      doc.save(fileName);
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("There was an error generating the PDF. Please try again.");
