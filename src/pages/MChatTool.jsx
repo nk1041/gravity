@@ -96,10 +96,24 @@ const MChatTool = () => {
     executeDownload();
   };
 
-  const executeDownload = () => {
+  const executeDownload = async () => {
     const doc = new jsPDF();
     const score = calculateScore();
     const result = getResult(score);
+    
+    if (user) {
+      try {
+        await supabase.from('documents').insert({
+          user_id: user.id,
+          title: `M-CHAT - ${studentName}`,
+          type: 'M-CHAT',
+          content: `Score: ${score}/20\nRisk Level: ${result.risk}\n\n${result.text}`,
+          metadata: { studentName, dateOfBirth, score, answers }
+        });
+      } catch (dbError) {
+        console.error("Failed to save to database:", dbError);
+      }
+    }
     
     doc.setFontSize(22);
     doc.setTextColor(107, 70, 193); // Primary color

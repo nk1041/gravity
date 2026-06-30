@@ -1,15 +1,45 @@
-import { useState } from 'react';
-import { Search, Filter, FileText, MoreVertical, Edit2, Copy, Trash2, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Filter, FileText, MoreVertical, Edit2, Copy, Trash2, Download, Loader2 } from 'lucide-react';
+import { supabase } from '../supabase';
 
 const MyDocuments = () => {
   const [search, setSearch] = useState('');
-  
-  const documents = [
-    { id: 1, title: 'IEP - James Doe', type: 'IEP', date: 'Oct 12, 2026', status: 'Generated' },
-    { id: 2, title: 'Lesson Plan: Fractions', type: 'Lesson Plan', date: 'Oct 10, 2026', status: 'Generated' },
-    { id: 3, title: 'M-CHAT Report: Sarah', type: 'Assessment', date: 'Oct 08, 2026', status: 'Generated' },
-    { id: 4, title: 'ITP - Michael Johnson', type: 'ITP', date: 'Oct 05, 2026', status: 'Generated' },
-  ];
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('documents')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteDocument = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+    try {
+      await supabase.from('documents').delete().eq('id', id);
+      setDocuments(documents.filter(doc => doc.id !== id));
+    } catch (error) {
+      console.error('Error deleting document:', error);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-12">
@@ -46,32 +76,51 @@ const MyDocuments = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {documents.map(doc => (
-                <tr key={doc.id} className="hover:bg-gray-50/50 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                        <FileText size={20} />
-                      </div>
-                      <span className="font-bold text-gray-800">{doc.title}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-altBackground border border-gray-200 text-gray-600">
-                      {doc.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500 text-sm">{doc.date}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Download PDF"><Download size={18} /></button>
-                      <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Edit"><Edit2 size={18} /></button>
-                      <button className="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-colors" title="Duplicate"><Copy size={18} /></button>
-                      <button className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                    <Loader2 size={32} className="animate-spin mx-auto text-primary/60 mb-3" />
+                    <p className="font-medium">Loading your documents...</p>
                   </td>
                 </tr>
-              ))}
+              ) : documents.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                      <FileText size={32} className="text-gray-400" />
+                    </div>
+                    <p className="font-medium text-gray-800">No documents yet.</p>
+                    <p className="text-sm mt-1">Generate a new IEP or Lesson Plan to see it here.</p>
+                  </td>
+                </tr>
+              ) : (
+                documents.map(doc => (
+                  <tr key={doc.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                          <FileText size={20} />
+                        </div>
+                        <span className="font-bold text-gray-800">{doc.title}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-altBackground border border-gray-200 text-gray-600">
+                        {doc.type}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 text-sm">
+                      {new Date(doc.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" title="Download PDF"><Download size={18} /></button>
+                        <button onClick={() => deleteDocument(doc.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><Trash2 size={18} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

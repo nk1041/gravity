@@ -180,6 +180,21 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         }
       }
       
+      // Save to database if user is logged in
+      if (user) {
+        try {
+          await supabase.from('documents').insert({
+            user_id: user.id,
+            title: `${formData.type.toUpperCase()} - ${formData.initials.toUpperCase()}`,
+            type: formData.type.toUpperCase(),
+            content: generatedContent,
+            metadata: formData
+          });
+        } catch (dbError) {
+          console.error("Failed to save to database:", dbError);
+        }
+      }
+
       doc.save(`SimplyAbled_${formData.type.toUpperCase()}_${new Date().getTime()}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
