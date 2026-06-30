@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import AuthModal from './AuthModal';
+import UserDropdown from './UserDropdown';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -62,16 +64,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-5">
             {user ? (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-gray-50/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-100 shadow-sm transition-all duration-300">
-                  <User size={16} className="text-primary" />
-                  {user.email.split('@')[0]}
-                </div>
-                <button 
-                  onClick={handleSignOut}
-                  className="text-gray-500 hover:text-red-500 font-medium text-sm transition-all duration-300 ease-linear-curve flex items-center gap-1.5 hover:-translate-y-0.5"
-                >
-                  <LogOut size={16} /> Sign Out
-                </button>
+                <UserDropdown user={user} onSignOut={handleSignOut} />
               </div>
             ) : (
               <>
@@ -154,7 +147,10 @@ const Header = () => {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
-        onSuccess={() => setIsAuthModalOpen(false)}
+        onSuccess={() => {
+          setIsAuthModalOpen(false);
+          navigate('/dashboard');
+        }}
       />
     </>
   );

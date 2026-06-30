@@ -1,7 +1,33 @@
-import { Outlet, NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Search, Settings, LogOut, Bell, Brain, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, FileText, Search, Brain, Bookmark } from 'lucide-react';
+import { supabase } from '../supabase';
+import UserDropdown from '../components/UserDropdown';
 
 const DashboardLayout = () => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate('/');
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        navigate('/');
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   return (
     <div className="flex h-screen bg-altBackground overflow-hidden">
       {/* Sidebar */}
@@ -29,6 +55,10 @@ const DashboardLayout = () => {
             <FileText size={20} />
             Documents
           </NavLink>
+          <NavLink to="/dashboard/templates" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${isActive ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-50'}`}>
+            <Bookmark size={20} />
+            Saved Templates
+          </NavLink>
 
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 mt-8 px-3">AI Tools</div>
           <NavLink to="/dashboard/tools/mchat" className={({isActive}) => `flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all ${isActive ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-50'}`}>
@@ -42,16 +72,15 @@ const DashboardLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-gray-50">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              ED
+          <Link to="/dashboard/profile" className="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold shadow-sm">
+              {user?.email ? user.email.substring(0,2).toUpperCase() : 'U'}
             </div>
-            <div className="flex-1">
-              <h4 className="text-sm font-bold text-gray-800">Educator</h4>
-              <p className="text-xs text-gray-500">Pro Plan</p>
+            <div className="flex-1 truncate">
+              <h4 className="text-sm font-bold text-gray-800 truncate">{user?.email || 'Educator'}</h4>
+              <p className="text-xs text-gray-500">View Profile</p>
             </div>
-            <ChevronDown size={16} className="text-gray-400" />
-          </div>
+          </Link>
         </div>
       </aside>
 
@@ -68,13 +97,7 @@ const DashboardLayout = () => {
             />
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-gray-400 hover:text-primary transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <button className="p-2 text-gray-400 hover:text-primary transition-colors">
-              <Settings size={20} />
-            </button>
+            <UserDropdown user={user} onSignOut={() => navigate('/')} />
           </div>
         </header>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Loader2, FileCheck2, Lock, Download, Copy } from 'lucide-react';
+import { Loader2, FileCheck2, Lock, Download, Copy, AlertCircle } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import FadeIn from './FadeIn';
 import AuthModal from './AuthModal';
 import { supabase } from '../supabase';
@@ -7,6 +8,8 @@ import { supabase } from '../supabase';
 const DocumentGenerator = ({ defaultType = 'iep' }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGenerated, setIsGenerated] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState("");
+  const [error, setError] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
   
@@ -65,13 +68,25 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
     }));
   };
 
-  const generateDocument = () => {
+  const generateDocument = async () => {
     setIsGenerating(true);
-    // Simulate API call processing the inputs
-    setTimeout(() => {
-      setIsGenerating(false);
+    setError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-document', {
+        body: { formData }
+      });
+
+      if (error) throw error;
+      
+      setGeneratedContent(data.result);
       setIsGenerated(true);
-    }, 2000);
+      
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to generate document. Ensure your Gemini API Key is set in Supabase Secrets.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -138,28 +153,32 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
       
       // We'll add some generic structure based on the type
       let yPos = 60;
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("1. Overview & Context", 20, yPos);
-      doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      yPos += 7;
       
-      const overviewText = `This document represents a comprehensive AI-generated record focusing on "${formData.goals}". All data and observations have been synthesized based on the provided parameters.`;
-      const splitOverview = doc.splitTextToSize(overviewText, 170);
-      doc.text(splitOverview, 20, yPos);
-      yPos += (splitOverview.length * 6) + 10;
+      // Clean basic markdown for PDF text output (remove bold/italics markers)
+      const cleanText = generatedContent.replace(/[*_]/g, '');
+      const paragraphs = cleanText.split('\n').filter(p => p.trim() !== '');
       
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("2. Key Details", 20, yPos);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      yPos += 7;
-      
-      const detailsText = `Based on the selected criteria, appropriate scaffolding and Universal Design for Learning (UDL) principles are embedded within the instruction. Accommodations applied: ${getActiveAccommodations()}.`;
-      const splitDetails = doc.splitTextToSize(detailsText, 170);
-      doc.text(splitDetails, 20, yPos);
+      for (let p of paragraphs) {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        if (p.startsWith('#')) {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          const headingText = p.replace(/^#+\s*/, '');
+          const split = doc.splitTextToSize(headingText, 170);
+          doc.text(split, 20, yPos);
+          yPos += (split.length * 6) + 4;
+        } else {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          const split = doc.splitTextToSize(p, 170);
+          doc.text(split, 20, yPos);
+          yPos += (split.length * 5) + 4;
+        }
+      }
       
       doc.save(`SimplyAbled_${formData.type.toUpperCase()}_${new Date().getTime()}.pdf`);
     } catch (error) {
@@ -328,6 +347,13 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     </div>
                   </div>
 
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-start gap-3 border border-red-100 animate-fade-in">
+                      <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium leading-relaxed">{error}</p>
+                    </div>
+                  )}
+
                   <div className="pt-4">
                     <button 
                       type="submit" 
@@ -399,126 +425,21 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     
                     <div className="space-y-6 flex-1 text-gray-700 text-sm leading-relaxed overflow-y-auto overflow-x-hidden relative pr-4 pb-12">
                       
-                      {formData.type === 'iep' && (
-                        <>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">1. Present Levels of Academic Achievement and Functional Performance (PLAAFP)</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed mb-4 text-justify">
-                              {formData.initials.toUpperCase()} is currently a student in the {formData.grade.toUpperCase()} grade. Formal and informal assessments indicate that {formData.initials.toUpperCase()} qualifies for special education services under the category of <span className="font-bold">{formData.category.toUpperCase()}</span>. The primary area of concern as noted by the multidisciplinary team is "{formData.goals}". Observations within the general education environment indicate that while {formData.initials.toUpperCase()} is highly motivated and participates eagerly in preferred activities, they experience significant challenges maintaining focus during unstructured tasks or independent work. Current reading and comprehension levels demonstrate a delay compared to neurotypical peers, significantly impacting their ability to access the general curriculum without targeted interventions.
-                            </p>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">2. Measurable Annual Goals</h4>
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4">
-                              <p className="font-bold text-gray-800 mb-2">Goal 1: Academic / Functional Progress</p>
-                              <p className="text-gray-700 leading-relaxed mb-3">
-                                By the end of the annual IEP cycle, when presented with grade-level materials and tasks related to {formData.goals.toLowerCase()}, {formData.initials.toUpperCase()} will utilize provided scaffolds and strategies to successfully complete the task with 80% accuracy in 4 out of 5 consecutive trials, as measured by teacher observations, work samples, and quarterly data collection.
-                              </p>
-                              <p className="font-bold text-gray-800 mb-2">Short-Term Objectives:</p>
-                              <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                                <li>By the end of the first quarter, {formData.initials.toUpperCase()} will accurately demonstrate the skill with 50% accuracy given maximum prompting.</li>
-                                <li>By the end of the second quarter, {formData.initials.toUpperCase()} will accurately demonstrate the skill with 65% accuracy given moderate prompting.</li>
-                                <li>By the end of the third quarter, {formData.initials.toUpperCase()} will accurately demonstrate the skill with 75% accuracy given minimal prompting.</li>
-                              </ul>
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">3. Specialized Instruction & Services</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed">
-                              {formData.initials.toUpperCase()} will receive specialized academic instruction targeting {formData.goals.toLowerCase()} for 45 minutes daily within a small group setting. Additionally, consultation between the special education teacher and general education teacher will occur weekly to ensure consistent implementation of accommodations across all learning environments.
-                            </p>
-                          </div>
-                        </>
-                      )}
-
-                      {formData.type === 'itp' && (
-                        <>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">1. Transition Assessments and Student Profile</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed mb-4 text-justify">
-                              Based on recent age-appropriate transition assessments (including student interviews, career interest inventories, and observational data), {formData.initials.toUpperCase()} demonstrates a strong inclination towards the following interests and strengths: "{formData.goals}". The student has expressed a clear desire to pursue a post-secondary pathway focused on <span className="font-bold capitalize">{formData.postSecondary.replace('-', ' ')}</span>. Currently in {formData.grade.toUpperCase()} grade, {formData.initials.toUpperCase()} requires targeted transition services to bridge the gap between current academic performance and the independence required for their chosen post-secondary environment.
-                            </p>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">2. Measurable Post-Secondary Goals</h4>
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4 space-y-4">
-                              <div>
-                                <p className="font-bold text-gray-800">Education/Training Goal:</p>
-                                <p className="text-gray-700">Upon graduation from high school, {formData.initials.toUpperCase()} will enroll in a <span className="capitalize">{formData.postSecondary.replace('-', ' ')}</span> program to advance their skills related to {formData.goals}.</p>
-                              </div>
-                              <div>
-                                <p className="font-bold text-gray-800">Employment Goal:</p>
-                                <p className="text-gray-700">Upon completion of their post-secondary education/training, {formData.initials.toUpperCase()} will maintain competitive, integrated employment in a field related to their strengths.</p>
-                              </div>
-                              <div>
-                                <p className="font-bold text-gray-800">Independent Living Goal (if appropriate):</p>
-                                <p className="text-gray-700">Upon graduation from high school, {formData.initials.toUpperCase()} will independently manage a daily schedule and personal budget, utilizing assistive technology as needed.</p>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">3. Transition Services & Activities</h4>
-                            <ul className="list-disc pl-5 space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700">
-                              <li><strong>Instruction:</strong> Enroll in elective courses that directly align with {formData.postSecondary.replace('-', ' ')} requirements.</li>
-                              <li><strong>Career Exploration:</strong> Participate in at least two job shadowing experiences or informational interviews by the end of the spring semester.</li>
-                              <li><strong>Self-Advocacy:</strong> Lead their upcoming IEP meeting by presenting a 3-minute summary of their strengths and required accommodations.</li>
-                            </ul>
-                          </div>
-                        </>
-                      )}
-
-                      {formData.type === 'lp' && (
-                        <>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">1. Lesson Context & Objectives</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed mb-4 text-justify">
-                              <strong>Subject:</strong> <span className="capitalize">{formData.subject}</span> | <strong>Grade:</strong> {formData.grade.toUpperCase()} <br/>
-                              This lesson is designed around the core objective: <span className="font-bold">"{formData.goals}"</span>. The curriculum is scaffolded to ensure accessibility for diverse learners, specifically incorporating Universal Design for Learning (UDL) principles. By the end of the 50-minute block, students will be able to demonstrate conceptual understanding through both formative assessment and peer-collaborative tasks.
-                            </p>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">2. Instructional Sequence & Timing</h4>
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4 space-y-3">
-                              <p className="text-gray-700"><strong>Warm-up / Bell Ringer (10 min):</strong><br/>Activate prior knowledge by presenting a real-world scenario related to {formData.goals.toLowerCase()}. Students will complete a brief "Think-Pair-Share" exercise using visual prompts provided on the smartboard.</p>
-                              <p className="text-gray-700"><strong>Direct Instruction (15 min):</strong><br/>Introduce the primary concept using multi-modal representations (visual, auditory, and kinesthetic elements). The teacher will explicitly model the steps required to achieve the objective, pausing every 5 minutes for quick comprehension checks.</p>
-                              <p className="text-gray-700"><strong>Guided Practice (15 min):</strong><br/>Students transition into heterogeneous small groups. They will work collaboratively on a guided activity while the educator circulates to provide targeted interventions and immediate feedback.</p>
-                              <p className="text-gray-700"><strong>Independent Application & Closure (10 min):</strong><br/>Students independently complete an exit ticket demonstrating their understanding of {formData.goals.toLowerCase()}. The educator will review the objective and preview the next lesson.</p>
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">3. Differentiation & Assessment</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed">
-                              <strong>Formative Assessment:</strong> Exit tickets will be graded on a 3-point rubric. Observational data collected during Guided Practice will inform tomorrow's grouping strategies.<br/>
-                              <strong>Differentiation Strategy:</strong> Provide graphic organizers and sentence starters for students requiring writing support. Advanced learners will be given extension tasks requiring higher-order critical thinking.
-                            </p>
-                          </div>
-                        </>
-                      )}
-
-                      {/* Generic fallback for other types (progress, assessment, etc.) */}
-                      {['progress', 'assessment', 'session', 'observation'].includes(formData.type) && (
-                        <>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">1. Overview & Context</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed mb-4 text-justify">
-                              This document represents a comprehensive record regarding the student's current status and recent activities. The primary focus of this documentation is centered around: <span className="font-bold">"{formData.goals}"</span>. All data and observations have been collected in a naturalistic educational environment, adhering to standard compliance protocols.
-                            </p>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">2. Detailed Data & Narrative</h4>
-                            <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-4 space-y-3">
-                              <p className="text-gray-700"><strong>Quantitative Data:</strong><br/>During the observation period, the student demonstrated target behaviors at a frequency that indicates steady progress towards baseline goals. Accuracy levels fluctuated between 60% and 80% depending on the complexity of the task and the level of scaffolding provided.</p>
-                              <p className="text-gray-700"><strong>Qualitative Narrative:</strong><br/>The student engaged well with the provided materials and showed a positive response to positive reinforcement strategies. Moving forward, the focus will remain on building independence and gradually fading physical and verbal prompts.</p>
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">3. Next Steps & Recommendations</h4>
-                            <p className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-gray-700 leading-relaxed">
-                              Continue current intervention strategies while monitoring progress weekly. Maintain consistent communication with the multidisciplinary team to ensure accommodations are applied uniformly across all settings.
-                            </p>
-                          </div>
-                        </>
-                      )}
+                      <ReactMarkdown
+                        components={{
+                          h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-gray-900 mb-4 mt-6" {...props} />,
+                          h2: ({node, ...props}) => <h2 className="text-xl font-bold text-gray-800 mb-3 mt-5" {...props} />,
+                          h3: ({node, ...props}) => <h3 className="text-lg font-bold text-gray-800 mb-2 mt-4" {...props} />,
+                          h4: ({node, ...props}) => <h4 className="text-base font-bold text-gray-800 mb-2 mt-3" {...props} />,
+                          p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-4 text-justify" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 text-gray-700 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 text-gray-700 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />
+                        }}
+                      >
+                        {generatedContent}
+                      </ReactMarkdown>
 
                       <div>
                         <h4 className="font-bold text-primary mb-2 uppercase tracking-wide text-xs">Applied Accommodations</h4>
