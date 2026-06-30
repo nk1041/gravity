@@ -80,10 +80,6 @@ const MChatTool = () => {
       alert("Please answer all 20 questions before submitting.");
       return;
     }
-    if (!user) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     setIsSubmitted(true);
   };
 
@@ -93,6 +89,14 @@ const MChatTool = () => {
   };
 
   const downloadPDF = () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    executeDownload();
+  };
+
+  const executeDownload = () => {
     const doc = new jsPDF();
     const score = calculateScore();
     const result = getResult(score);
@@ -234,7 +238,9 @@ const MChatTool = () => {
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={(user) => {
           setIsAuthModalOpen(false);
-          setIsSubmitted(true);
+          if (isSubmitted) {
+            executeDownload();
+          }
         }}
       />
     </div>

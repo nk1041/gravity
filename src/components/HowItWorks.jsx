@@ -36,17 +36,17 @@ const HowItWorks = () => {
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative mt-8">
           {/* Connector Line (Desktop) */}
-          <div className="hidden lg:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -z-10 -translate-y-12"></div>
+          <div className="hidden lg:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent -z-10 -translate-y-12"></div>
           
           {steps.map((step, i) => (
-            <FadeIn key={i} delay={i * 100} direction="up" className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner">
+            <FadeIn key={i} delay={i * 100} direction="up" className="bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:shadow-premium-hover border border-gray-100/50 text-center flex flex-col items-center group transition-all duration-300 ease-linear-curve hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-primary/5 border border-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner transition-transform duration-300 ease-linear-curve group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-primary group-hover:text-white">
                 {step.icon}
               </div>
-              <h3 className="text-xl font-bold font-heading text-gray-800 mb-3">{step.title}</h3>
-              <p className="text-gray-600">{step.description}</p>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-3 tracking-tight group-hover:text-primary transition-colors">{step.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
             </FadeIn>
           ))}
         </div>

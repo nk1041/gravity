@@ -76,10 +76,6 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!user) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     generateDocument();
   };
 
@@ -106,6 +102,72 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
     return active.length > 0 ? active.join(", ") : "Standard accommodations applied";
   };
 
+  const handleExportClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    executeExport();
+  };
+
+  const executeExport = async () => {
+    try {
+      // Dynamic import of jsPDF to save bundle size
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      
+      const title = getDocumentTitle();
+      const contentId = formData.type === 'lp' ? 'this lesson' : formData.initials.toUpperCase();
+      
+      doc.setFontSize(22);
+      doc.setTextColor(30, 41, 59); // text-slate-800
+      doc.text(title, 20, 20);
+      
+      doc.setFontSize(12);
+      doc.setTextColor(100, 116, 139); // text-slate-500
+      doc.text(`Student/Topic: ${contentId}`, 20, 30);
+      doc.text(`Grade: ${formData.grade.toUpperCase()}`, 20, 37);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 44);
+      
+      doc.setDrawColor(226, 232, 240); // border-slate-200
+      doc.line(20, 48, 190, 48);
+      
+      doc.setFontSize(11);
+      doc.setTextColor(51, 65, 85); // text-slate-700
+      
+      // We'll add some generic structure based on the type
+      let yPos = 60;
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("1. Overview & Context", 20, yPos);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      yPos += 7;
+      
+      const overviewText = `This document represents a comprehensive AI-generated record focusing on "${formData.goals}". All data and observations have been synthesized based on the provided parameters.`;
+      const splitOverview = doc.splitTextToSize(overviewText, 170);
+      doc.text(splitOverview, 20, yPos);
+      yPos += (splitOverview.length * 6) + 10;
+      
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("2. Key Details", 20, yPos);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      yPos += 7;
+      
+      const detailsText = `Based on the selected criteria, appropriate scaffolding and Universal Design for Learning (UDL) principles are embedded within the instruction. Accommodations applied: ${getActiveAccommodations()}.`;
+      const splitDetails = doc.splitTextToSize(detailsText, 170);
+      doc.text(splitDetails, 20, yPos);
+      
+      doc.save(`SimplyAbled_${formData.type.toUpperCase()}_${new Date().getTime()}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("There was an error generating the PDF. Please try again.");
+    }
+  };
+
   return (
     <section id="generator" className="py-24 bg-white relative overflow-hidden">
       {/* Background decoration */}
@@ -125,7 +187,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
               
 
               {!isGenerated ? (
-                <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 relative">
+                <form onSubmit={handleSubmit} className="space-y-6 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] border border-gray-100/80 relative transition-all duration-500 ease-linear-curve">
                   <div className="grid grid-cols-2 gap-5">
                     {formData.type !== 'lp' ? (
                       <div>
@@ -137,7 +199,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                           onChange={handleInputChange}
                           type="text" 
                           placeholder="e.g. J.D." 
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200/80 focus:ring-4 focus:ring-primary/15 focus:border-primary outline-none transition-all duration-300 ease-linear-curve hover:border-primary/40 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.02)]" 
                         />
                       </div>
                     ) : (
@@ -148,7 +210,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                           name="subject"
                           value={formData.subject}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200/80 focus:ring-4 focus:ring-primary/15 focus:border-primary outline-none transition-all duration-300 ease-linear-curve hover:border-primary/40 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.02)] bg-white appearance-none"
                         >
                           <option value="">Select Subject</option>
                           <option value="math">Mathematics</option>
@@ -232,7 +294,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                         formData.type === 'itp' ? "e.g. Enjoys technology, strong visual learner" :
                         "e.g. Understanding fractions and decimals"
                       }
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" 
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200/80 focus:ring-4 focus:ring-primary/15 focus:border-primary outline-none transition-all duration-300 ease-linear-curve hover:border-primary/40 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.02)]" 
                     />
                   </div>
 
@@ -240,25 +302,25 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     <label className="block text-sm font-bold text-gray-700 mb-3">Accommodations Needed</label>
                     <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-700">
                       <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${formData.accommodations.time ? 'bg-primary border-primary' : 'border-gray-300 group-hover:border-primary'}`}>
+                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all duration-300 ease-linear-curve shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05)] ${formData.accommodations.time ? 'bg-primary border-primary shadow-primary/20' : 'border-gray-300 group-hover:border-primary/60 bg-white'}`}>
                           {formData.accommodations.time && <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>}
                         </div>
                         <input type="checkbox" name="time" checked={formData.accommodations.time} onChange={handleCheckboxChange} className="hidden" /> Extra Time
                       </label>
                       <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${formData.accommodations.visual ? 'bg-primary border-primary' : 'border-gray-300 group-hover:border-primary'}`}>
+                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all duration-300 ease-linear-curve shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05)] ${formData.accommodations.visual ? 'bg-primary border-primary shadow-primary/20' : 'border-gray-300 group-hover:border-primary/60 bg-white'}`}>
                           {formData.accommodations.visual && <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>}
                         </div>
                         <input type="checkbox" name="visual" checked={formData.accommodations.visual} onChange={handleCheckboxChange} className="hidden" /> Visual Schedules
                       </label>
                       <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${formData.accommodations.breaks ? 'bg-primary border-primary' : 'border-gray-300 group-hover:border-primary'}`}>
+                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all duration-300 ease-linear-curve shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05)] ${formData.accommodations.breaks ? 'bg-primary border-primary shadow-primary/20' : 'border-gray-300 group-hover:border-primary/60 bg-white'}`}>
                           {formData.accommodations.breaks && <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>}
                         </div>
                         <input type="checkbox" name="breaks" checked={formData.accommodations.breaks} onChange={handleCheckboxChange} className="hidden" /> Frequent Breaks
                       </label>
                       <label className="flex items-center gap-3 cursor-pointer group">
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${formData.accommodations.quiet ? 'bg-primary border-primary' : 'border-gray-300 group-hover:border-primary'}`}>
+                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all duration-300 ease-linear-curve shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05)] ${formData.accommodations.quiet ? 'bg-primary border-primary shadow-primary/20' : 'border-gray-300 group-hover:border-primary/60 bg-white'}`}>
                           {formData.accommodations.quiet && <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>}
                         </div>
                         <input type="checkbox" name="quiet" checked={formData.accommodations.quiet} onChange={handleCheckboxChange} className="hidden" /> Quiet Workspace
@@ -270,7 +332,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     <button 
                       type="submit" 
                       disabled={isGenerating}
-                      className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-[0_8px_20px_rgb(107,70,193,0.25)] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+                      className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold text-lg transition-all duration-300 ease-linear-curve shadow-premium hover:shadow-premium-hover flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
                     >
                       {isGenerating ? (
                         <>
@@ -284,8 +346,8 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   </div>
                 </form>
               ) : (
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-green-100 flex flex-col items-center justify-center text-center h-[520px]">
-                  <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-[0_8px_40px_-10px_rgba(34,197,94,0.15)] border border-green-100/80 flex flex-col items-center justify-center text-center h-[520px] transition-all duration-500">
+                  <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(34,197,94,0.1)] transition-transform duration-500 hover:scale-110">
                     <FileCheck2 size={40} />
                   </div>
                   <h3 className="text-3xl font-bold font-heading mb-3 text-gray-800">Success!</h3>
@@ -295,12 +357,12 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   <div className="flex flex-col w-full max-w-sm gap-4">
                     <a 
                       href="#" 
-                      onClick={(e) => { e.preventDefault(); alert("Exporting functionality coming soon!"); }}
-                      className="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                      onClick={handleExportClick}
+                      className="w-full bg-primary text-white py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve shadow-premium hover:shadow-premium-hover flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
                     >
                       <Download size={20} /> Export as PDF
                     </a>
-                    <button onClick={resetForm} className="w-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold transition-all">
+                    <button onClick={resetForm} className="w-full bg-gray-50/80 backdrop-blur-sm hover:bg-gray-100 border border-gray-200/80 text-gray-700 py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
                       Create Another Document
                     </button>
                   </div>
@@ -312,8 +374,8 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
           <div className="w-full lg:w-1/2 flex justify-center sticky top-24">
             <FadeIn direction="left" delay={200} className="w-full">
               {/* Dynamic Document Preview */}
-              <div className={`relative w-full max-w-lg aspect-[8.5/11] bg-white rounded-xl shadow-2xl border border-gray-200 p-8 transition-all duration-1000 ${isGenerating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
-                <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-primary to-secondary rounded-t-xl"></div>
+              <div className={`relative w-full max-w-lg aspect-[8.5/11] bg-white rounded-2xl shadow-[0_15px_50px_-10px_rgba(0,0,0,0.1)] border border-gray-200/80 p-8 transition-all duration-700 ease-linear-curve ${isGenerating ? 'opacity-70 scale-[0.98]' : 'opacity-100 scale-100'}`}>
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary rounded-t-2xl"></div>
                 
                 {isGenerated ? (
                   <div className="h-full flex flex-col font-sans animate-fade-in">
@@ -471,7 +533,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   </div>
                 ) : (
                   // Placeholder wireframe when not generated
-                  <div className="h-full w-full pointer-events-none">
+                  <div className="h-full w-full pointer-events-none animate-pulse">
                     <div className="flex justify-between items-start mb-8">
                       <div>
                         <div className="h-8 w-48 bg-gray-200 rounded mb-3"></div>
@@ -500,10 +562,12 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
 
                 
                 {isGenerating && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl z-10 flex-col gap-4">
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center rounded-2xl z-10 flex-col gap-5 transition-all duration-500">
                     <Loader2 size={56} className="text-primary animate-spin" />
-                    <span className="font-bold text-primary text-xl">Synthesizing data...</span>
-                    <span className="text-gray-500 text-sm">Applying AI models</span>
+                    <div className="flex flex-col items-center">
+                      <span className="font-bold text-gray-900 text-xl tracking-tight">Synthesizing data...</span>
+                      <span className="text-primary font-medium mt-1">Applying AI models</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -518,7 +582,9 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={(user) => {
           setIsAuthModalOpen(false);
-          generateDocument();
+          if (isGenerated) {
+            executeExport();
+          }
         }}
       />
     </section>

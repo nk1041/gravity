@@ -14,22 +14,22 @@ const DocumentPreview = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* IEP Preview */}
           <FadeIn delay={100} direction="up" className="relative group perspective-1000">
-            <div className="bg-white p-6 rounded-2xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-200 aspect-[8.5/11] transform transition-transform duration-500 group-hover:-rotate-2 group-hover:scale-105 flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
-              <div className="mb-6 mt-2 border-b border-gray-100 pb-4">
-                <h3 className="text-xl font-bold font-heading text-gray-800">IEP Goal Draft</h3>
-                <p className="text-xs text-gray-400 mt-1">Student: J.D. | Grade: 3rd</p>
+            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-premium-hover border border-gray-100/80 aspect-[8.5/11] transform transition-all duration-500 ease-linear-curve group-hover:-rotate-2 group-hover:scale-105 group-hover:-translate-y-2 flex flex-col relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-secondary opacity-80 group-hover:opacity-100 transition-opacity"></div>
+              <div className="mb-6 mt-2 border-b border-gray-100/60 pb-4">
+                <h3 className="text-xl font-bold font-heading text-gray-900 tracking-tight">IEP Goal Draft</h3>
+                <p className="text-xs text-gray-400 mt-1.5 font-medium">Student: J.D. | Grade: 3rd</p>
               </div>
-              <div className="space-y-4 flex-1">
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Present Levels</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50 p-2 rounded">
+              <div className="space-y-5 flex-1">
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-primary/70 transition-colors">Present Levels</h4>
+                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50/80 p-3 rounded-xl border border-gray-100/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
                     J.D. is currently reading at a mid-1st grade level. He struggles with decoding multisyllabic words and identifying main ideas in grade-level texts.
                   </p>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Annual Goal</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed bg-primary/5 p-2 rounded text-primary font-medium">
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-primary/70 transition-colors">Annual Goal</h4>
+                  <p className="text-xs text-primary/90 leading-relaxed bg-primary/5 p-3 rounded-xl font-medium border border-primary/10 shadow-[inset_0_2px_4px_rgba(107,70,193,0.02)]">
                     By October 2027, when given a 3rd-grade level text, J.D. will accurately decode multisyllabic words and state the main idea with 80% accuracy in 4 out of 5 consecutive trials.
                   </p>
                 </div>
@@ -39,25 +39,25 @@ const DocumentPreview = () => {
 
           {/* Lesson Plan Preview */}
           <FadeIn delay={200} direction="up" className="relative group perspective-1000 mt-8 md:mt-0">
-            <div className="bg-white p-6 rounded-2xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-200 aspect-[8.5/11] transform transition-transform duration-500 group-hover:rotate-1 group-hover:scale-105 flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-blue-500"></div>
-              <div className="mb-6 mt-2 border-b border-gray-100 pb-4">
-                <h3 className="text-xl font-bold font-heading text-gray-800">Math Lesson Plan</h3>
-                <p className="text-xs text-gray-400 mt-1">Topic: Fractions | Duration: 45m</p>
+            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(59,130,246,0.15)] border border-gray-100/80 aspect-[8.5/11] transform transition-all duration-500 ease-linear-curve group-hover:rotate-1 group-hover:scale-105 group-hover:-translate-y-2 flex flex-col relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
+              <div className="mb-6 mt-2 border-b border-gray-100/60 pb-4">
+                <h3 className="text-xl font-bold font-heading text-gray-900 tracking-tight">Math Lesson Plan</h3>
+                <p className="text-xs text-gray-400 mt-1.5 font-medium">Topic: Fractions | Duration: 45m</p>
               </div>
-              <div className="space-y-4 flex-1">
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Objective</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50 p-2 rounded">
+              <div className="space-y-5 flex-1">
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-blue-500/70 transition-colors">Objective</h4>
+                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50/80 p-3 rounded-xl border border-gray-100/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
                     Students will be able to identify and create equivalent fractions using visual models (fraction bars and pie charts).
                   </p>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Accommodations</h4>
-                  <ul className="text-xs text-gray-600 space-y-1 bg-blue-50/50 p-2 rounded">
-                    <li>• Provide physical fraction manipulatives</li>
-                    <li>• Allow verbal responses instead of written</li>
-                    <li>• Extended time for independent practice (1.5x)</li>
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-blue-500/70 transition-colors">Accommodations</h4>
+                  <ul className="text-xs text-blue-700/90 space-y-2 bg-blue-50/50 p-3 rounded-xl font-medium border border-blue-100/50 shadow-[inset_0_2px_4px_rgba(59,130,246,0.02)]">
+                    <li className="flex items-start gap-1.5"><span className="text-blue-400 mt-0.5">•</span> Provide physical fraction manipulatives</li>
+                    <li className="flex items-start gap-1.5"><span className="text-blue-400 mt-0.5">•</span> Allow verbal responses instead of written</li>
+                    <li className="flex items-start gap-1.5"><span className="text-blue-400 mt-0.5">•</span> Extended time for independent practice (1.5x)</li>
                   </ul>
                 </div>
               </div>
@@ -66,22 +66,22 @@ const DocumentPreview = () => {
 
           {/* Progress Report Preview */}
           <FadeIn delay={300} direction="up" className="relative group perspective-1000 mt-8 md:mt-0">
-            <div className="bg-white p-6 rounded-2xl shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-200 aspect-[8.5/11] transform transition-transform duration-500 group-hover:-rotate-1 group-hover:scale-105 flex flex-col relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-green-500"></div>
-              <div className="mb-6 mt-2 border-b border-gray-100 pb-4">
-                <h3 className="text-xl font-bold font-heading text-gray-800">Progress Report</h3>
-                <p className="text-xs text-gray-400 mt-1">Term: Q1 | Goal: Social Skills</p>
+            <div className="bg-white/90 backdrop-blur-sm p-6 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_-8px_rgba(34,197,94,0.15)] border border-gray-100/80 aspect-[8.5/11] transform transition-all duration-500 ease-linear-curve group-hover:-rotate-1 group-hover:scale-105 group-hover:-translate-y-2 flex flex-col relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-green-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
+              <div className="mb-6 mt-2 border-b border-gray-100/60 pb-4">
+                <h3 className="text-xl font-bold font-heading text-gray-900 tracking-tight">Progress Report</h3>
+                <p className="text-xs text-gray-400 mt-1.5 font-medium">Term: Q1 | Goal: Social Skills</p>
               </div>
-              <div className="space-y-4 flex-1">
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Data Summary</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50 p-2 rounded">
+              <div className="space-y-5 flex-1">
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-green-500/70 transition-colors">Data Summary</h4>
+                  <p className="text-xs text-gray-600 leading-relaxed bg-gray-50/80 p-3 rounded-xl border border-gray-100/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.01)]">
                     Data collected over the past 9 weeks indicates that Sarah has successfully initiated interactions with peers in 65% of recorded opportunities (baseline: 30%).
                   </p>
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Narrative</h4>
-                  <p className="text-xs text-gray-600 leading-relaxed bg-green-50/50 p-2 rounded">
+                <div className="group/item transition-all">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 group-hover:text-green-500/70 transition-colors">Narrative</h4>
+                  <p className="text-xs text-green-700/90 leading-relaxed bg-green-50/50 p-3 rounded-xl font-medium border border-green-100/50 shadow-[inset_0_2px_4px_rgba(34,197,94,0.02)]">
                     Sarah has made excellent progress this quarter. She is consistently utilizing her "social script" cards during unstructured recess time. We will continue to fade physical prompts as she approaches her 80% mastery goal.
                   </p>
                 </div>

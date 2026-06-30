@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300 py-16 border-t border-gray-800">
@@ -22,31 +24,31 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-bold font-heading mb-4">Product</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-primary-300 transition-colors">IEP Generator</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">ITP Generator</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Lesson Plans</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Security</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">IEP Generator</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">ITP Generator</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Lesson Plans</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Pricing</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Security</a></li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-white font-bold font-heading mb-4">Company</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-primary-300 transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Contact</a></li>
+              <li><Link to="/about" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">About Us</Link></li>
+              <li><Link to="/careers" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Careers</Link></li>
+              <li><Link to="/blog" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Blog</Link></li>
+              <li><Link to="/contact" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Contact</Link></li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-white font-bold font-heading mb-4">Legal</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">FERPA Compliance</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-colors">HIPAA Compliance</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">FERPA Compliance</a></li>
+              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">HIPAA Compliance</a></li>
             </ul>
           </div>
           
@@ -56,16 +58,16 @@ const Footer = () => {
           <p className="text-sm text-gray-500 mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} SimplyAbled, Inc. All rights reserved.
           </p>
-          <div className="flex items-center">
-            <form className="flex w-full max-w-sm">
+          <div className="flex items-center w-full md:w-auto">
+            <form className="flex w-full max-w-sm relative group">
               <input 
                 type="email" 
                 placeholder="Subscribe to our newsletter" 
-                className="bg-gray-800 text-white px-4 py-2 rounded-l-lg border border-gray-700 focus:outline-none focus:border-primary w-full text-sm"
+                className="bg-gray-800/50 text-white px-5 py-2.5 rounded-l-xl border border-gray-700/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full text-sm transition-all duration-300 ease-linear-curve"
               />
               <button 
                 type="submit" 
-                className="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-r-lg font-medium text-sm transition-colors"
+                className="bg-primary hover:bg-primary-600 text-white px-6 py-2.5 rounded-r-xl font-medium text-sm transition-all duration-300 ease-linear-curve shadow-[0_2px_10px_-2px_rgba(107,70,193,0.3)] hover:shadow-[0_4px_15px_-3px_rgba(107,70,193,0.4)] active:scale-95"
               >
                 Subscribe
               </button>

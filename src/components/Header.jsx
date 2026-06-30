@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabase';
+import AuthModal from './AuthModal';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -24,66 +26,61 @@ const Header = () => {
   };
 
   const navLinks = [
-    { name: 'Home', href: '#' },
-    { name: 'Features', href: '#features' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/' },
+    { name: 'Features', href: '/features' },
+    { name: 'How It Works', href: '/how-it-works' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md shadow-sm">
+    <>
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-gray-100/50 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.02)] transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <a href="#" className="text-2xl font-heading font-bold text-primary">
+          <div className="flex-shrink-0 flex items-center group cursor-pointer">
+            <Link to="/" className="text-2xl font-heading font-bold text-primary transition-all duration-300 ease-linear-curve group-hover:opacity-80">
               SimplyAbled
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-6 items-center">
+          <nav className="hidden md:flex space-x-8 items-center">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
-                onClick={(e) => {
-                  if (['About', 'Contact'].includes(link.name)) {
-                    e.preventDefault();
-                    alert(`${link.name} page coming soon!`);
-                  }
-                }}
-                className="text-textColor hover:text-primary transition-colors text-sm font-medium"
+                to={link.href}
+                className="text-textColor/70 hover:text-primary transition-all duration-300 ease-linear-curve text-sm font-medium hover:-translate-y-0.5"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
           {/* CTAs */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-5">
             {user ? (
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-gray-50/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-100 shadow-sm transition-all duration-300">
                   <User size={16} className="text-primary" />
                   {user.email.split('@')[0]}
                 </div>
                 <button 
                   onClick={handleSignOut}
-                  className="text-gray-500 hover:text-red-500 font-medium text-sm transition-colors flex items-center gap-1.5"
+                  className="text-gray-500 hover:text-red-500 font-medium text-sm transition-all duration-300 ease-linear-curve flex items-center gap-1.5 hover:-translate-y-0.5"
                 >
                   <LogOut size={16} /> Sign Out
                 </button>
               </div>
             ) : (
               <>
-                <a href="#" onClick={(e) => { e.preventDefault(); alert('Login coming soon!'); }} className="text-textColor hover:text-primary font-medium text-sm transition-colors">
+                <a href="#" onClick={(e) => { e.preventDefault(); setIsAuthModalOpen(true); }} className="text-textColor/80 hover:text-primary font-medium text-sm transition-all duration-300 ease-linear-curve hover:-translate-y-0.5">
                   Login
                 </a>
                 <a
-                  href="#documentation"
-                  className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm cursor-pointer"
+                  onClick={(e) => { e.preventDefault(); setIsAuthModalOpen(true); }}
+                  className="bg-primary text-white px-6 py-2.5 rounded-xl font-medium text-sm transition-all duration-300 ease-linear-curve shadow-premium hover:shadow-premium-hover hover:-translate-y-0.5 active:translate-y-0 active:scale-95 cursor-pointer"
                 >
                   Get Started Free
                 </a>
@@ -109,21 +106,14 @@ const Header = () => {
         <div className="md:hidden bg-background border-t border-gray-100">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="block px-3 py-2 rounded-md text-base font-medium text-textColor hover:text-primary hover:bg-altBackground"
-                onClick={(e) => {
-                  if (['About', 'Contact'].includes(link.name)) {
-                    e.preventDefault();
-                    alert(`${link.name} page coming soon!`);
-                  } else {
-                    setIsOpen(false);
-                  }
-                }}
+                onClick={() => setIsOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
             <div className="mt-4 pt-4 border-t border-gray-100 px-3 space-y-3 flex flex-col">
               {user ? (
@@ -143,14 +133,14 @@ const Header = () => {
                   <a
                     href="#"
                     className="block text-center text-base font-medium text-textColor hover:text-primary"
-                    onClick={(e) => { e.preventDefault(); alert('Login coming soon!'); setIsOpen(false); }}
+                    onClick={(e) => { e.preventDefault(); setIsAuthModalOpen(true); setIsOpen(false); }}
                   >
                     Login
                   </a>
                   <a
-                    href="#documentation"
+                    href="#"
                     className="block text-center bg-primary text-white px-4 py-3 rounded-xl font-medium text-base shadow-sm cursor-pointer"
-                    onClick={() => setIsOpen(false)}
+                    onClick={(e) => { e.preventDefault(); setIsAuthModalOpen(true); setIsOpen(false); }}
                   >
                     Get Started Free
                   </a>
@@ -161,6 +151,12 @@ const Header = () => {
         </div>
       )}
     </header>
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        onSuccess={() => setIsAuthModalOpen(false)}
+      />
+    </>
   );
 };
 
