@@ -81,11 +81,14 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="flex items-center md:hidden">
+          {/* Mobile menu button & User Profile */}
+          <div className="flex items-center gap-3 md:hidden">
+            {user && (
+              <UserDropdown user={user} onSignOut={handleSignOut} />
+            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-textColor hover:text-primary focus:outline-none"
+              className="text-textColor hover:text-primary focus:outline-none ml-2"
               aria-label="Toggle menu"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -110,24 +113,13 @@ const Header = () => {
             ))}
             <div className="mt-4 pt-4 border-t border-gray-100 px-3 space-y-3 flex flex-col">
               {user ? (
-                <>
-                  <div className="text-sm font-medium text-gray-500 px-3 pb-2 text-center">
-                    Logged in as {user.email}
-                  </div>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="block w-full text-center bg-primary text-white hover:bg-primary/90 px-4 py-3 rounded-xl font-bold text-base transition-colors"
-                  >
-                    Go to Dashboard
-                  </Link>
-                  <button
-                    onClick={() => { handleSignOut(); setIsOpen(false); }}
-                    className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-100 px-4 py-3 rounded-xl font-bold text-base transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block w-full text-center bg-primary text-white hover:bg-primary/90 px-4 py-3 rounded-xl font-bold text-base transition-colors"
+                >
+                  Go to Dashboard
+                </Link>
               ) : (
                 <>
                   <a
