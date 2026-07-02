@@ -101,11 +101,6 @@ const MChatTool = () => {
     const score = calculateScore();
     const result = getResult(score);
     
-    doc.setFontSize(11);
-    doc.setTextColor(100, 100, 100);
-    const splitText = doc.splitTextToSize(result.text, 170);
-    doc.text(splitText, 20, 95);
-    
     doc.setFontSize(22);
     doc.setTextColor(107, 70, 193); // Primary color
     doc.text("SimplyAbled", 20, 20);
