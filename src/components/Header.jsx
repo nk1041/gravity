@@ -114,6 +114,13 @@ const Header = () => {
                   <div className="text-sm font-medium text-gray-500 px-3 pb-2 text-center">
                     Logged in as {user.email}
                   </div>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full text-center bg-primary text-white hover:bg-primary/90 px-4 py-3 rounded-xl font-bold text-base transition-colors"
+                  >
+                    Go to Dashboard
+                  </Link>
                   <button
                     onClick={() => { handleSignOut(); setIsOpen(false); }}
                     className="block w-full text-center bg-red-50 text-red-600 hover:bg-red-100 px-4 py-3 rounded-xl font-bold text-base transition-colors"
