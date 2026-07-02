@@ -83,7 +83,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
       
     } catch (err) {
       console.error(err);
-      setError(err.message || "Failed to generate document. Ensure your Gemini API Key is set in Supabase Secrets.");
+      setError("An unexpected error occurred while generating your document. Please try again later.");
     } finally {
       setIsGenerating(false);
     }
