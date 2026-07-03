@@ -7,15 +7,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#6B46C1",
-        secondary: "#9F7AEA",
+        primary: "#EA580C",
+        secondary: "#F97316",
         background: "#FFFFFF",
-        altBackground: "#F5F3FF",
+        altBackground: "#FFF7ED",
         textColor: "#1F2937",
       },
       fontFamily: {
-        heading: ["Poppins", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        heading: ["Nunito", "sans-serif"],
+        body: ["DM Sans", "sans-serif"],
       }
     },
   },
