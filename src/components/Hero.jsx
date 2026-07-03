@@ -36,13 +36,6 @@ const Hero = () => {
                 >
                   Get Started Free
                 </a>
-                <a 
-                  href="#" 
-                  onClick={(e) => { e.preventDefault(); alert('Demo coming soon!'); }}
-                  className="w-full sm:w-auto bg-white/80 backdrop-blur-sm text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border border-gray-200/60 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 ease-linear-curve flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
-                >
-                  <Play size={20} className="text-gray-400 group-hover:text-primary transition-colors" /> Watch Demo
-                </a>
               </div>
             </FadeIn>
           </div>
