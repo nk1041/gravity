@@ -81,6 +81,10 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         console.error("Function invocation error:", error);
         throw new Error(error.message || "Failed to generate document.");
       }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
       
       setGeneratedContent(data.result);
       setIsGenerated(true);
@@ -238,7 +242,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
           
-          <div className="w-full lg:w-1/2">
+          <div className={`w-full lg:w-1/2 ${isGenerated ? 'order-2 lg:order-1' : 'order-1'}`}>
             <FadeIn direction="right">
               <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">
                 {formData.type === 'iep' ? 'IEP' : formData.type === 'itp' ? 'ITP' : 'Lesson Plan'} Generator — <span className="text-primary">Zero Prompting</span>
@@ -431,6 +435,15 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     >
                       <Download size={20} /> Export as PDF
                     </a>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedContent);
+                        alert('Document text copied to clipboard!');
+                      }}
+                      className="w-full bg-white text-primary border-2 border-primary/20 py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve hover:bg-primary/5 hover:border-primary/40 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+                    >
+                      <Copy size={20} /> Copy to Clipboard
+                    </button>
                     <button onClick={resetForm} className="w-full bg-gray-50/80 backdrop-blur-sm hover:bg-gray-100 border border-gray-200/80 text-gray-700 py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
                       Create Another Document
                     </button>
@@ -440,7 +453,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
             </FadeIn>
           </div>
 
-          <div className={`w-full lg:w-1/2 justify-center lg:sticky top-24 ${(!isGenerated && !isGenerating) ? 'hidden lg:flex' : 'flex'}`}>
+          <div className={`w-full lg:w-1/2 justify-center lg:sticky top-24 ${(!isGenerated && !isGenerating) ? 'hidden lg:flex' : 'flex'} ${isGenerated ? 'order-1 lg:order-2' : 'order-2'}`}>
             <FadeIn direction="left" delay={200} className="w-full">
               {/* Dynamic Document Preview */}
               <div className={`relative w-full max-w-lg aspect-[8.5/11] bg-white rounded-2xl shadow-[0_15px_50px_-10px_rgba(0,0,0,0.1)] border border-gray-200/80 p-8 transition-all duration-700 ease-linear-curve ${isGenerating ? 'opacity-70 scale-[0.98]' : 'opacity-100 scale-100'}`}>
