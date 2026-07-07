@@ -76,14 +76,18 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
         body: { formData }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Log detailed error and throw message to be caught below
+        console.error("Function invocation error:", error);
+        throw new Error(error.message || "Failed to generate document.");
+      }
       
       setGeneratedContent(data.result);
       setIsGenerated(true);
       
     } catch (err) {
       console.error(err);
-      setError("An unexpected error occurred while generating your document. Please try again later.");
+      setError(err.message || "An unexpected error occurred while generating your document. Please try again later.");
     } finally {
       setIsGenerating(false);
     }
@@ -227,12 +231,12 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
   };
 
   return (
-    <section id="generator" className="py-24 bg-white relative overflow-hidden">
+    <section id="generator" className="py-12 md:py-24 bg-white relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-altBackground/50 -skew-x-12 transform origin-top-right"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-16 items-start">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-start">
           
           <div className="w-full lg:w-1/2">
             <FadeIn direction="right">
@@ -245,8 +249,8 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
               
 
               {!isGenerated ? (
-                <form onSubmit={handleSubmit} className="space-y-6 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] border border-gray-100/80 relative transition-all duration-500 ease-linear-curve">
-                  <div className="grid grid-cols-2 gap-5">
+                <form onSubmit={handleSubmit} className="space-y-6 bg-white/80 backdrop-blur-md p-5 sm:p-8 rounded-3xl shadow-[0_8px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-5px_rgba(0,0,0,0.08)] border border-gray-100/80 relative transition-all duration-500 ease-linear-curve">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {formData.type !== 'lp' ? (
                       <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Student Initials</label>
@@ -358,7 +362,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
 
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-3">Accommodations Needed</label>
-                    <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-700">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-medium text-gray-700">
                       <label className="flex items-center gap-3 cursor-pointer group">
                         <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all duration-300 ease-linear-curve shadow-[0_2px_5px_-1px_rgba(0,0,0,0.05)] ${formData.accommodations.time ? 'bg-primary border-primary shadow-primary/20' : 'border-gray-300 group-hover:border-primary/60 bg-white'}`}>
                           {formData.accommodations.time && <div className="w-2.5 h-2.5 bg-white rounded-sm"></div>}
@@ -411,7 +415,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   </div>
                 </form>
               ) : (
-                <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-[0_8px_40px_-10px_rgba(34,197,94,0.15)] border border-green-100/80 flex flex-col items-center justify-center text-center h-[520px] transition-all duration-500">
+                <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-[0_8px_40px_-10px_rgba(34,197,94,0.15)] border border-green-100/80 flex flex-col items-center justify-center text-center min-h-[400px] md:h-[520px] h-auto transition-all duration-500">
                   <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(34,197,94,0.1)] transition-transform duration-500 hover:scale-110">
                     <FileCheck2 size={40} />
                   </div>
