@@ -419,37 +419,72 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   </div>
                 </form>
               ) : (
-                <div className="bg-white/90 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-[0_8px_40px_-10px_rgba(34,197,94,0.15)] border border-green-100/80 flex flex-col items-center justify-center text-center min-h-[400px] md:h-[520px] h-auto transition-all duration-500">
-                  <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-[inset_0_2px_10px_rgba(34,197,94,0.1)] transition-transform duration-500 hover:scale-110">
-                    <FileCheck2 size={40} />
+                <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-[0_8px_40px_-10px_rgba(34,197,94,0.15)] border border-green-100/80 overflow-hidden transition-all duration-500 animate-fade-in">
+                  {/* Success Header */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-100 text-green-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-[inset_0_2px_8px_rgba(34,197,94,0.1)]">
+                      <FileCheck2 size={24} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-bold text-gray-800">Document Generated!</h3>
+                      <p className="text-sm text-gray-500 truncate">
+                        {getDocumentTitle()} — <span className="font-semibold text-primary">{formData.type === 'lp' ? formData.subject : formData.initials.toUpperCase()}</span> · Grade {formData.grade.toUpperCase()} · {new Date().toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-3xl font-bold font-heading mb-3 text-gray-800">Success!</h3>
-                  <p className="text-gray-600 mb-8 max-w-sm text-lg">
-                    The {getDocumentTitle().split(' ')[0]} for <span className="font-bold text-primary">{formData.type === 'lp' ? 'this lesson' : formData.initials.toUpperCase()}</span> has been successfully generated using the AI engine. 
-                  </p>
-                  <div className="flex flex-col w-full max-w-sm gap-4">
-                    <a 
-                      href="#" 
+
+                  {/* Document Content */}
+                  <div className="p-6 max-h-[60vh] overflow-y-auto text-sm text-gray-700 leading-relaxed">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({node, ...props}) => <h1 className="text-xl font-bold text-gray-900 mb-3 mt-5 pb-1 border-b border-gray-100" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="text-lg font-bold text-gray-800 mb-2 mt-4" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-base font-bold text-primary mb-2 mt-3" {...props} />,
+                        h4: ({node, ...props}) => <h4 className="text-sm font-bold text-gray-800 mb-1 mt-2" {...props} />,
+                        p: ({node, ...props}) => <p className="text-gray-700 leading-relaxed mb-3" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 text-gray-700 space-y-1" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 text-gray-700 space-y-1" {...props} />,
+                        li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                      }}
+                    >
+                      {generatedContent}
+                    </ReactMarkdown>
+
+                    {/* Accommodations Badge */}
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <h4 className="font-bold text-primary mb-1 uppercase tracking-wide text-xs">Applied Accommodations</h4>
+                      <div className="bg-primary/5 p-3 rounded-lg text-primary font-medium border border-primary/10 text-xs">
+                        {getActiveAccommodations()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="p-4 border-t border-gray-100 bg-gray-50/60 flex flex-col gap-3">
+                    <a
+                      href="#"
                       onClick={handleExportClick}
-                      className="w-full bg-primary text-white py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve shadow-premium hover:shadow-premium-hover flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+                      className="w-full bg-primary text-white py-3.5 rounded-xl font-bold transition-all duration-300 shadow-premium hover:shadow-premium-hover flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
                     >
                       <Download size={20} /> Export as PDF
                     </a>
-                    <button 
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText(generatedContent);
                         alert('Document text copied to clipboard!');
                       }}
-                      className="w-full bg-white text-primary border-2 border-primary/20 py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve hover:bg-primary/5 hover:border-primary/40 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+                      className="w-full bg-white text-primary border-2 border-primary/20 py-3.5 rounded-xl font-bold transition-all duration-300 hover:bg-primary/5 hover:border-primary/40 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
                     >
                       <Copy size={20} /> Copy to Clipboard
                     </button>
-                    <button onClick={resetForm} className="w-full bg-gray-50/80 backdrop-blur-sm hover:bg-gray-100 border border-gray-200/80 text-gray-700 py-4 rounded-xl font-bold transition-all duration-300 ease-linear-curve hover:shadow-[0_4px_15px_-3px_rgba(0,0,0,0.05)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
+                    <button onClick={resetForm} className="w-full bg-transparent hover:bg-gray-100 border border-gray-200 text-gray-600 py-3.5 rounded-xl font-bold transition-all duration-300">
                       Create Another Document
                     </button>
                   </div>
                 </div>
               )}
+
             </FadeIn>
           </div>
 
