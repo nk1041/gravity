@@ -469,15 +469,6 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                     >
                       <Download size={20} /> Export as PDF
                     </a>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(generatedContent);
-                        alert('Document text copied to clipboard!');
-                      }}
-                      className="w-full bg-white text-primary border-2 border-primary/20 py-3.5 rounded-xl font-bold transition-all duration-300 hover:bg-primary/5 hover:border-primary/40 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
-                    >
-                      <Copy size={20} /> Copy to Clipboard
-                    </button>
                     <button onClick={resetForm} className="w-full bg-transparent hover:bg-gray-100 border border-gray-200 text-gray-600 py-3.5 rounded-xl font-bold transition-all duration-300">
                       Create Another Document
                     </button>
