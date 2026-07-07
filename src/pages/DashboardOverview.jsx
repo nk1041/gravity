@@ -1,23 +1,74 @@
-import { FileText, Users, Brain, Clock, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Users, Brain, Clock, ChevronRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabase';
 
 const DashboardOverview = () => {
-  const recentStudents = [
-    { id: 1, name: 'James Doe', grade: '3rd Grade', lastActive: '2 hours ago' },
-    { id: 2, name: 'Sarah Smith', grade: '5th Grade', lastActive: 'Yesterday' },
-    { id: 3, name: 'Michael Johnson', grade: '1st Grade', lastActive: '2 days ago' },
-  ];
+  const [user, setUser] = useState(null);
+  const [recentDocs, setRecentDocs] = useState([]);
+  const [recentStudents, setRecentStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const recentDocs = [
-    { id: 1, title: 'IEP Draft - J.D.', type: 'IEP', date: 'Oct 12, 2026' },
-    { id: 2, title: 'Math Lesson Plan - Fractions', type: 'Lesson Plan', date: 'Oct 10, 2026' },
-    { id: 3, title: 'M-CHAT Screening - S.S.', type: 'Assessment', date: 'Oct 08, 2026' },
-  ];
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        setUser(user);
+
+        // Fetch recent documents (last 3)
+        const { data: docs } = await supabase
+          .from('documents')
+          .select('id, title, type, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        setRecentDocs(docs || []);
+
+        // Fetch recent students (last 3)
+        const { data: students } = await supabase
+          .from('students')
+          .select('id, name, grade, updated_at')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(3);
+
+        setRecentStudents(students || []);
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const timeAgo = (dateStr) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
+
+  const getDocColor = (type) => {
+    if (!type) return 'bg-primary/10 text-primary';
+    const t = type.toUpperCase();
+    if (t === 'IEP') return 'bg-primary/10 text-primary';
+    if (t === 'LP') return 'bg-blue-50 text-blue-500';
+    return 'bg-green-50 text-green-500';
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       <header>
-        <h1 className="text-3xl font-bold font-heading text-textColor">Welcome back, Educator 👋</h1>
+        <h1 className="text-3xl font-bold font-heading text-textColor">
+          Welcome back{user?.email ? `, ${user.email.split('@')[0]}` : ''} 👋
+        </h1>
         <p className="text-gray-500 mt-2">Here's what's happening with your students today.</p>
       </header>
 
@@ -63,23 +114,35 @@ const DashboardOverview = () => {
             <Link to="/dashboard/students" className="text-sm text-primary font-medium hover:underline">View All</Link>
           </div>
           <div className="divide-y divide-gray-50 flex-1">
-            {recentStudents.map(student => (
-              <div key={student.id} className="p-4 px-6 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer group">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
-                    {student.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 group-hover:text-primary transition-colors">{student.name}</h4>
-                    <p className="text-xs text-gray-500">{student.grade}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  <Clock size={14} /> {student.lastActive}
-                  <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 size={28} className="animate-spin text-primary/60" />
               </div>
-            ))}
+            ) : recentStudents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <Users size={36} className="mb-3 text-gray-200" />
+                <p className="font-medium text-gray-500">No students added yet.</p>
+                <Link to="/dashboard/students" className="text-sm text-primary mt-2 hover:underline">Add your first student →</Link>
+              </div>
+            ) : (
+              recentStudents.map(student => (
+                <div key={student.id} className="p-4 px-6 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                      {student.name?.split(' ').map(n => n[0]).join('') || '?'}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 group-hover:text-primary transition-colors">{student.name}</h4>
+                      <p className="text-xs text-gray-500">{student.grade}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                    <Clock size={14} /> {timeAgo(student.updated_at)}
+                    <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 
@@ -90,23 +153,35 @@ const DashboardOverview = () => {
             <Link to="/dashboard/documents" className="text-sm text-primary font-medium hover:underline">View All</Link>
           </div>
           <div className="divide-y divide-gray-50 flex-1">
-            {recentDocs.map(doc => (
-              <div key={doc.id} className="p-4 px-6 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer group">
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${doc.type === 'IEP' ? 'bg-primary/10 text-primary' : doc.type === 'Lesson Plan' ? 'bg-blue-50 text-blue-500' : 'bg-green-50 text-green-500'}`}>
-                    <FileText size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800 group-hover:text-primary transition-colors">{doc.title}</h4>
-                    <p className="text-xs font-medium text-gray-500">{doc.type}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  {doc.date}
-                  <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 size={28} className="animate-spin text-primary/60" />
               </div>
-            ))}
+            ) : recentDocs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <FileText size={36} className="mb-3 text-gray-200" />
+                <p className="font-medium text-gray-500">No documents generated yet.</p>
+                <Link to="/dashboard/tools/iep" className="text-sm text-primary mt-2 hover:underline">Generate your first document →</Link>
+              </div>
+            ) : (
+              recentDocs.map(doc => (
+                <div key={doc.id} className="p-4 px-6 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer group">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getDocColor(doc.type)}`}>
+                      <FileText size={18} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 group-hover:text-primary transition-colors">{doc.title}</h4>
+                      <p className="text-xs font-medium text-gray-500">{doc.type}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                    {new Date(doc.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </div>
