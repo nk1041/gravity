@@ -440,7 +440,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
             </FadeIn>
           </div>
 
-          <div className="w-full lg:w-1/2 flex justify-center sticky top-24">
+          <div className={`w-full lg:w-1/2 justify-center lg:sticky top-24 ${(!isGenerated && !isGenerating) ? 'hidden lg:flex' : 'flex'}`}>
             <FadeIn direction="left" delay={200} className="w-full">
               {/* Dynamic Document Preview */}
               <div className={`relative w-full max-w-lg aspect-[8.5/11] bg-white rounded-2xl shadow-[0_15px_50px_-10px_rgba(0,0,0,0.1)] border border-gray-200/80 p-8 transition-all duration-700 ease-linear-curve ${isGenerating ? 'opacity-70 scale-[0.98]' : 'opacity-100 scale-100'}`}>
