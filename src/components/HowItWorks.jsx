@@ -1,55 +1,54 @@
+import { Edit3, Wand2, FileSearch, Send } from 'lucide-react';
 import { FileSignature, FormInput, Bot, DownloadCloud } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const HowItWorks = () => {
   const steps = [
     {
-      icon: FileSignature,
-      title: '1. Select Template',
-      description: 'Choose from 8 distinct documentation templates tailored for special education.'
+      icon: <FileSignature size={24} />,
+      title: '1. Select Document',
+      description: 'Choose from 8 distinct documentation templates.'
     },
     {
-      icon: FormInput,
-      title: '2. Fill Out Form',
-      description: 'Complete a highly structured, simple form with basic student details.'
+      icon: <FormInput size={24} />,
+      title: '2. Fill Form',
+      description: 'Complete a highly structured, simple form.'
     },
     {
-      icon: Bot,
-      title: '3. Generate Instantly',
-      description: 'Zero prompting required. Our structured AI model writes the draft.'
+      icon: <Bot size={24} />,
+      title: '3. AI Generation',
+      description: 'Zero prompting. AI writes the document instantly.'
     },
     {
-      icon: DownloadCloud,
-      title: '4. Export PDF',
-      description: 'Review the generated text, make final adjustments, and export to PDF.'
+      icon: <DownloadCloud size={24} />,
+      title: '4. Edit & Export',
+      description: 'Review the text, make adjustments, and download PDF.'
     }
   ];
 
   return (
-    <section className="py-24 bg-white border-b border-gray-100">
+    <section className="py-24 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <FadeIn direction="up">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-black font-heading text-gray-900 mb-4">How it works</h2>
-            <p className="text-lg text-gray-500">From a blank template to a fully compliant document in four simple steps.</p>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4 text-textColor">How It Works</h2>
+            <p className="text-xl text-gray-500">From blank page to compliant document in 4 steps.</p>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          {steps.map((step, i) => {
-            const Icon = step.icon;
-            return (
-              <FadeIn key={i} delay={i * 80} direction="up">
-                <div className="bg-white p-6 rounded-xl border border-gray-200 h-full flex flex-col hover:border-gray-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-200">
-                  <div className="w-10 h-10 rounded-lg bg-orange-50 text-primary flex items-center justify-center mb-5 shrink-0">
-                    <Icon size={20} />
-                  </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2">{step.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
-                </div>
-              </FadeIn>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative mt-8">
+          {/* Connector Line (Desktop) */}
+          <div className="hidden lg:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent -z-10 -translate-y-12"></div>
+          
+          {steps.map((step, i) => (
+            <FadeIn key={i} delay={i * 100} direction="up" className="bg-white p-8 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:shadow-premium-hover border border-gray-100/50 text-center flex flex-col items-center group transition-all duration-300 ease-linear-curve hover:-translate-y-1">
+              <div className="w-16 h-16 rounded-2xl bg-primary/5 border border-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner transition-transform duration-300 ease-linear-curve group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-primary group-hover:text-white">
+                {step.icon}
+              </div>
+              <h3 className="text-xl font-bold font-heading text-gray-900 mb-3 tracking-tight group-hover:text-primary transition-colors">{step.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+            </FadeIn>
+          ))}
         </div>
       </div>
     </section>
