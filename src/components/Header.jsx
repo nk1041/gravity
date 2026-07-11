@@ -13,6 +13,9 @@ const Header = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const handleOpenAuth = () => setIsAuthModalOpen(true);
+    window.addEventListener('openAuthModal', handleOpenAuth);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
     });
@@ -21,7 +24,10 @@ const Header = () => {
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('openAuthModal', handleOpenAuth);
+    };
   }, []);
 
   const handleSignOut = async () => {

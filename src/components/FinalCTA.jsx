@@ -16,12 +16,12 @@ const FinalCTA = () => {
           <p className="text-lg text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
             Join special education professionals who use SimplyAbled to cut document time by hours every week.
           </p>
-          <a
-            href="#generator"
+          <button
+            onClick={(e) => { e.preventDefault(); window.dispatchEvent(new Event('openAuthModal')); }}
             className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-xl font-semibold text-base transition-all duration-200 shadow-premium hover:shadow-premium-hover hover:-translate-y-0.5 active:translate-y-0"
           >
-            Generate a Document Free <ArrowRight size={17} />
-          </a>
+            Get Started Free <ArrowRight size={17} />
+          </button>
           <p className="mt-5 text-sm text-gray-600">
             No credit card required · Free plan available
           </p>

@@ -35,12 +35,12 @@ const Hero = () => {
 
             <FadeIn delay={300}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8">
-                <a
-                  href="#generator"
+                <button
+                  onClick={(e) => { e.preventDefault(); window.dispatchEvent(new Event('openAuthModal')); }}
                   className="bg-primary hover:bg-primary/90 text-white px-7 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2 shadow-premium hover:shadow-premium-hover hover:-translate-y-0.5 active:translate-y-0"
                 >
                   Get Started Free <ArrowRight size={17} />
-                </a>
+                </button>
                 <a
                   href="#features"
                   className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-7 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 flex items-center justify-center"
