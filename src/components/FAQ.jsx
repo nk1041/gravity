@@ -6,28 +6,28 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "Is SimplyAbled FERPA and HIPAA compliant?",
-      answer: "Yes. Data privacy is our top priority. We use enterprise-grade encryption, and our platform is fully compliant with FERPA, HIPAA, and state-level student privacy laws. We never train our base models on your students' PII."
+      question: "How much time will this actually save me?",
+      answer: "On average, special educators using SimplyAbled cut their paperwork time by over 50%. Instead of staring at a blank page or copy-pasting old templates, you can generate a professional first draft in seconds."
     },
     {
-      question: "Can I use SimplyAbled for any special education document?",
-      answer: "Currently, we support comprehensive IEPs, ITPs (Transition Plans), and differentiated Lesson Plans. We are actively developing templates for 504 Plans and Behavioral Intervention Plans (BIPs)."
+      question: "Is my students' data secure and compliant?",
+      answer: "Yes. Data privacy is our top priority. The platform is fully compliant with FERPA and HIPAA. We use enterprise-grade encryption, and we never use your students' personal information to train public AI models."
     },
     {
-      question: "Does the AI replace the teacher's judgment?",
-      answer: "Absolutely not. SimplyAbled acts as an intelligent assistant to draft the foundational paperwork based on your inputs. The educator remains fully in control to review, edit, and finalize every document."
+      question: "Do I need to learn how to write 'AI prompts'?",
+      answer: "Not at all! We know you're busy, so we built the platform to be zero-prompt. You just fill out simple, structured forms (checkboxes, dropdowns, and short notes), and the platform handles all the complex drafting behind the scenes."
     },
     {
-      question: "How does the school/district billing work?",
-      answer: "We offer flexible invoicing for schools and districts, and we accept purchase orders (POs). District plans also include dedicated account management and custom integrations."
+      question: "Can I edit the documents after they are created?",
+      answer: "Absolutely. SimplyAbled acts as your assistant to create a high-quality foundation. You have a full rich-text editor to review, tweak, and finalize every detail before you download the PDF."
     },
     {
-      question: "Does it integrate with our Student Information System (SIS)?",
-      answer: "District-level plans include integrations with major SIS platforms like Clever, ClassLink, PowerSchool, and Infinite Campus to automatically sync student rosters securely."
+      question: "Can I manage multiple students on the platform?",
+      answer: "Yes! You can create secure profiles for your entire caseload. This allows you to track individual progress, store past assessments, and keep all their documentation organized in one single dashboard."
     },
     {
-      question: "What if I need help or training?",
-      answer: "All users have access to our comprehensive knowledge base and email support. School and District plans include live training sessions, onboarding support, and priority response times."
+      question: "Is there a free version I can try?",
+      answer: "Yes, we offer a free tier designed specifically for individual educators so you can start generating documents, managing your workflow, and saving time immediately without needing a credit card."
     }
   ];
 
