@@ -4,6 +4,9 @@ import Documentation from '../components/Documentation';
 import ToolGrid from '../components/ToolGrid';
 import HowItWorks from '../components/HowItWorks';
 import DocumentPreview from '../components/DocumentPreview';
+import Pricing from '../components/Pricing';
+import FAQ from '../components/FAQ';
+import FinalCTA from '../components/FinalCTA';
 
 function LandingPage() {
   return (
@@ -14,6 +17,9 @@ function LandingPage() {
       <ToolGrid />
       <HowItWorks />
       <DocumentPreview />
+      <Pricing />
+      <FAQ />
+      <FinalCTA />
     </>
   );
 }
