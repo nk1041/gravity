@@ -1,4 +1,4 @@
-import { FileText, ClipboardList, BookOpen, TrendingUp, Presentation, BookType, LineChart, Brain } from 'lucide-react';
+import { FileText, ClipboardList, BookOpen, TrendingUp, Presentation, BookType, LineChart, Brain, Users, FolderOpen, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import FadeIn from './FadeIn';
 
@@ -6,64 +6,64 @@ const Documentation = () => {
   const tools = [
     {
       icon: <FileText size={28} />,
-      title: 'IEP Generator',
+      title: 'Documentation',
       description: 'Draft comprehensive Individualized Education Programs instantly.',
       link: '/tool/iep'
     },
     {
-      icon: <TrendingUp size={28} />,
-      title: 'ITP Generator',
-      description: 'Build Individualized Transition Plans for post-secondary goals.',
-      link: '/tool/itp'
+      icon: <Brain size={28} />,
+      title: 'Assessments',
+      description: 'Automated screening checklists, scoring, and PDF reports.',
+      link: '/tool/mchat'
     },
     {
-      icon: <BookOpen size={28} />,
-      title: 'Lesson Plan Generator',
-      description: 'Create differentiated lesson plans with built-in accommodations.',
-      link: '/tool/lp'
+      icon: <Users size={28} />,
+      title: 'Student Profiles',
+      description: 'Maintain detailed, secure records of student progress and needs.',
+      link: '/dashboard/students'
     },
     {
       icon: <LineChart size={28} />,
-      title: 'Progress Report Generator',
-      description: 'Generate data-driven progress updates for parents and admin.',
+      title: 'Progress Tracking',
+      description: 'Generate data-driven progress updates for parents and administration.',
       link: '/tool/progress'
     },
     {
+      icon: <MessageCircle size={28} />,
+      title: 'Parent Communication',
+      description: 'Easily share updates, reports, and collaborate with families.',
+      link: '#'
+    },
+    {
       icon: <ClipboardList size={28} />,
-      title: 'Assessment Report',
+      title: 'Reports',
       description: 'Synthesize raw assessment data into readable narrative reports.',
-      link: '/tool/assessment'
+      link: '/dashboard/documents'
     },
     {
       icon: <Presentation size={28} />,
-      title: 'Session Notes',
-      description: 'Log therapy or intervention session notes quickly and compliantly.',
+      title: 'AI Assistant',
+      description: 'Smart assistance to help you log session notes and draft materials.',
       link: '/tool/session'
     },
     {
-      icon: <BookType size={28} />,
-      title: 'Daily Observation',
-      description: 'Record structured behavioral and academic observations.',
-      link: '/tool/observation'
-    },
-    {
-      icon: <Brain size={28} />,
-      title: 'M-CHAT Screening',
-      description: 'Automated autism screening checklist, scoring, and PDF reports.',
-      link: '/tool/mchat'
+      icon: <FolderOpen size={28} />,
+      title: 'Resource Library',
+      description: 'Access templates and educational materials tailored for special ed.',
+      link: '/dashboard/templates'
     }
   ];
 
   return (
-    <section id="documentation" className="py-24 bg-altBackground relative overflow-hidden">
+    <section id="features" className="py-24 bg-altBackground relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FadeIn direction="up">
           <div className="text-center max-w-3xl mx-auto mb-20">
             <h2 className="text-3xl md:text-5xl font-bold font-heading mb-6 text-textColor tracking-tight">
-              Documentation in <span className="text-primary">Minutes</span>
+              Platform <span className="text-primary">Features</span>
             </h2>
             <p className="text-xl text-gray-600 leading-relaxed">
-              Select a tool, fill a structured form, and let our zero-prompting AI generate a professional document instantly.
+              Explore the comprehensive suite of tools built to manage every aspect of special education.
             </p>
           </div>
         </FadeIn>

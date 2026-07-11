@@ -14,22 +14,20 @@ const Hero = () => {
           <div className="flex-1 text-center lg:text-left max-w-xl">
             <FadeIn delay={0}>
               <p className="text-sm font-semibold text-primary uppercase tracking-widest mb-5">
-                Special Education Toolkit
+                Special Education Platform
               </p>
             </FadeIn>
 
             <FadeIn delay={100}>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black font-heading leading-[1.1] tracking-tight text-gray-900 mb-6">
-                Generate IEPs, ITPs &<br />
-                Lesson Plans —{' '}
-                <span className="text-primary">in seconds.</span>
+                The Complete Platform for<br />
+                <span className="text-primary">Special Education.</span>
               </h1>
             </FadeIn>
 
             <FadeIn delay={200}>
               <p className="text-lg text-gray-500 leading-relaxed mb-10">
-                SimplyAbled handles the paperwork so you can focus on your students.
-                Fill out a simple form — our AI writes the document.
+                Everything special educators need to manage documentation, assessments, lesson planning, student progress, and collaboration in one place.
               </p>
             </FadeIn>
 
@@ -39,13 +37,13 @@ const Hero = () => {
                   href="#generator"
                   className="bg-primary hover:bg-primary/90 text-white px-7 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2 shadow-premium hover:shadow-premium-hover hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  Try it free <ArrowRight size={17} />
+                  Get Started Free <ArrowRight size={17} />
                 </a>
                 <a
                   href="#features"
                   className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-7 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 flex items-center justify-center"
                 >
-                  See all features
+                  Explore Platform
                 </a>
               </div>
 
@@ -101,7 +99,7 @@ const Hero = () => {
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400">
-                      <span className="flex items-center gap-1"><Sparkles size={11} className="text-primary" /> AI generated</span>
+                      <span className="flex items-center gap-1"><Sparkles size={11} className="text-primary" /> SimplyAbled assisted</span>
                       <span>Completed in 1.3s</span>
                     </div>
                   </div>

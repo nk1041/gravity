@@ -59,22 +59,19 @@ serve(async (req) => {
       prompt = `Write a detailed educational document based on:\n- Type: ${formData.type}\n- Identifier: ${formData.initials}\n- Grade: ${formData.grade}\n- Goals/Focus: ${formData.goals}\n\nPlease output the response in well-formatted Markdown.`;
     }
 
-    const fetchWithFallback = async (primaryModel, fallbackModel, payload) => {
-      console.log(`Sending prompt to Gemini (${primaryModel})...`);
-      let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${primaryModel}:generateContent?key=${geminiApiKey}`, {
+    const fetchWithRetry = async (modelName, payload, retries = 1) => {
+      console.log(`Sending prompt to Gemini (${modelName})...`);
+      let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       
-      // If primary model is overloaded (503), try the fallback model
-      if (!res.ok && res.status === 503) {
-        console.log(`${primaryModel} is overloaded (503). Falling back to ${fallbackModel}...`);
-        res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${fallbackModel}:generateContent?key=${geminiApiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+      // If model is overloaded (503) and we have retries left, wait and retry
+      if (!res.ok && res.status === 503 && retries > 0) {
+        console.log(`${modelName} is overloaded (503). Waiting 1.5s and retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        return fetchWithRetry(modelName, payload, retries - 1);
       }
       return res;
     };
@@ -93,7 +90,7 @@ serve(async (req) => {
       }
     };
 
-    const response = await fetchWithFallback('gemini-3.5-flash', 'gemini-1.5-flash', payload);
+    const response = await fetchWithRetry('gemini-3.5-flash', payload);
 
     if (!response.ok) {
       const errorText = await response.text();
