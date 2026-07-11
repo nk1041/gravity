@@ -1,12 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap');
 @import "tailwindcss";
 
+:root {
+  --bg-color: #FFFFFF;
+  --alt-bg-color: #FAFAF9;
+  --text-color: #111827;
+  
+  --card-bg: #FFFFFF;
+  --card-border: rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  --bg-color: #0f172a;
+  --alt-bg-color: #1e293b;
+  --text-color: #f8fafc;
+  
+  --card-bg: #1e293b;
+  --card-border: rgba(255, 255, 255, 0.05);
+}
+
 @theme {
   --color-primary: #EA580C;
   --color-secondary: #F97316;
-  --color-background: #FFFFFF;
-  --color-altBackground: #FAFAF9;
-  --color-textColor: #111827;
+  --color-background: var(--bg-color);
+  --color-altBackground: var(--alt-bg-color);
+  --color-textColor: var(--text-color);
 
   --font-heading: "Nunito", sans-serif;
   --font-body: "Inter", sans-serif;
@@ -25,6 +43,21 @@
     font-family: var(--font-heading);
     color: var(--color-textColor);
   }
+
+  /* Global Dark Mode Overrides for hardcoded utility classes */
+  html.dark .bg-white { background-color: var(--card-bg) !important; }
+  html.dark .bg-gray-50 { background-color: var(--alt-bg-color) !important; }
+  html.dark .bg-gray-100 { background-color: #334155 !important; }
+  
+  html.dark .text-gray-900 { color: #f8fafc !important; }
+  html.dark .text-gray-800 { color: #f1f5f9 !important; }
+  html.dark .text-gray-700, 
+  html.dark .text-gray-600, 
+  html.dark .text-gray-500 { color: #94a3b8 !important; }
+  
+  html.dark .border-gray-100, 
+  html.dark .border-gray-200, 
+  html.dark .border-gray-300 { border-color: rgba(255,255,255,0.1) !important; }
 }
 
 html {

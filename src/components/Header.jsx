@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import AuthModal from './AuthModal';
 import UserDropdown from './UserDropdown';
+import DarkModeToggle from './DarkModeToggle';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,6 +63,7 @@ const Header = () => {
 
           {/* CTAs */}
           <div className="hidden md:flex items-center space-x-5">
+            <DarkModeToggle />
             {user ? (
               <div className="flex items-center gap-4">
                 <UserDropdown user={user} onSignOut={handleSignOut} />
@@ -83,6 +85,7 @@ const Header = () => {
 
           {/* Mobile menu button & User Profile */}
           <div className="flex items-center gap-3 md:hidden">
+            <DarkModeToggle />
             {user && (
               <UserDropdown user={user} onSignOut={handleSignOut} />
             )}
