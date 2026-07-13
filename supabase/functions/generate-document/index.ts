@@ -90,7 +90,7 @@ serve(async (req) => {
       }
     };
 
-    const response = await fetchWithRetry('gemini-1.5-flash', payload);
+    const response = await fetchWithRetry('gemini-3.5-flash', payload);
 
     if (!response.ok) {
       const errorText = await response.text();
