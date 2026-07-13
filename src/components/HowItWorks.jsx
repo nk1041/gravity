@@ -15,7 +15,7 @@ const HowItWorks = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative mt-8">
           
           {/* Before SimplyAbled */}
-          <FadeIn delay={100} direction="up" className="bg-gray-50 p-10 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:shadow-premium-hover border border-gray-100 flex flex-col group transition-all duration-300 ease-linear-curve hover:-translate-y-1">
+          <FadeIn delay={100} direction="up" className="bg-gray-50 p-6 sm:p-10 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] hover:shadow-premium-hover border border-gray-100 flex flex-col group transition-all duration-300 ease-linear-curve hover:-translate-y-1">
             <div className="w-16 h-16 rounded-2xl bg-gray-200/50 border border-gray-200 text-gray-500 flex items-center justify-center mb-8 shadow-inner transition-transform duration-300 ease-linear-curve group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-gray-200">
               <XCircle size={28} />
             </div>
@@ -41,7 +41,7 @@ const HowItWorks = () => {
           </FadeIn>
 
           {/* After SimplyAbled */}
-          <FadeIn delay={200} direction="up" className="bg-white p-10 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-8px_rgba(107,70,193,0.15)] border border-primary/20 flex flex-col group transition-all duration-300 ease-linear-curve hover:-translate-y-1 relative overflow-hidden">
+          <FadeIn delay={200} direction="up" className="bg-white p-6 sm:p-10 rounded-3xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-8px_rgba(107,70,193,0.15)] border border-primary/20 flex flex-col group transition-all duration-300 ease-linear-curve hover:-translate-y-1 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-secondary opacity-100"></div>
             <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-8 shadow-inner transition-transform duration-300 ease-linear-curve group-hover:scale-110 group-hover:rotate-3 group-hover:bg-primary group-hover:text-white">
               <CheckCircle size={28} />

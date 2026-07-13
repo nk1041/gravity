@@ -95,7 +95,7 @@ const Features = () => {
 
         {/* Stats row */}
         <FadeIn delay={300} direction="up">
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 rounded-xl overflow-hidden border border-gray-200">
+          <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-px bg-gray-200 rounded-xl overflow-hidden border border-gray-200">
             {[
               { value: '< 2 min', label: 'To generate a document' },
               { value: '100%', label: 'IDEA & FERPA aligned' },

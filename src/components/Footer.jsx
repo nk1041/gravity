@@ -13,7 +13,7 @@ const Footer = () => {
             <p className="text-gray-400 mb-6 max-w-sm">
               Empowering special education professionals with intelligent tools to reduce paperwork and improve student outcomes.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap gap-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Twitter</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">LinkedIn</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Facebook</a>
@@ -63,11 +63,11 @@ const Footer = () => {
               <input 
                 type="email" 
                 placeholder="Subscribe to our newsletter" 
-                className="bg-gray-800/50 text-white px-5 py-2.5 rounded-l-xl border border-gray-700/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full text-sm transition-all duration-300 ease-linear-curve"
+                className="bg-gray-800/50 text-white px-5 py-2.5 rounded-l-xl border border-gray-700/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-full text-sm transition-all duration-300 ease-linear-curve min-w-0 flex-1"
               />
               <button 
                 type="submit" 
-                className="bg-primary hover:bg-primary-600 text-white px-6 py-2.5 rounded-r-xl font-medium text-sm transition-all duration-300 ease-linear-curve shadow-[0_2px_10px_-2px_rgba(107,70,193,0.3)] hover:shadow-[0_4px_15px_-3px_rgba(107,70,193,0.4)] active:scale-95"
+                className="bg-primary hover:bg-primary-600 text-white px-6 py-2.5 rounded-r-xl font-medium text-sm transition-all duration-300 ease-linear-curve shadow-[0_2px_10px_-2px_rgba(107,70,193,0.3)] hover:shadow-[0_4px_15px_-3px_rgba(107,70,193,0.4)] active:scale-95 shrink-0"
               >
                 Subscribe
               </button>

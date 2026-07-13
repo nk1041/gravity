@@ -47,7 +47,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 animate-fade-in border border-gray-100">
+      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 animate-fade-in border border-gray-100">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
