@@ -12,13 +12,7 @@ const Hero = () => {
 
           {/* Left: Copy */}
           <div className="flex-1 text-center lg:text-left max-w-xl">
-            <FadeIn delay={0}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-semibold mb-6 hover:bg-primary/10 transition-colors cursor-pointer">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                SimplyAbled 2.0 is now live
-                <ArrowRight size={12} className="ml-1" />
-              </div>
-            </FadeIn>
+
 
             <FadeIn delay={100}>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black font-heading leading-[1.1] tracking-tight text-gray-900 mb-6">
