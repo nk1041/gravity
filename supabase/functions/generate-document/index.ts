@@ -119,11 +119,16 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error("Function Error:", error);
+    console.error("Function Error [Server Log]:", error);
     
-    let userMessage = error.message || "An unexpected error occurred.";
-    if (userMessage.includes("503")) {
-      userMessage = "The AI model is currently experiencing high demand. Please try again in a few moments.";
+    let userMessage = "An unexpected error occurred while generating the document. Please try again.";
+    const rawError = error.message || "";
+    
+    // Whitelist specific safe error messages to display to the user
+    if (rawError.includes("extremely high demand") || rawError.includes("503")) {
+      userMessage = "The AI model is currently experiencing extremely high demand. Please wait a moment and try again.";
+    } else if (rawError.includes("Missing formData")) {
+      userMessage = "Missing student data. Please fill out the form completely.";
     }
 
     return new Response(
