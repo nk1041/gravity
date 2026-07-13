@@ -59,21 +59,29 @@ serve(async (req) => {
       prompt = `Write a detailed educational document based on:\n- Type: ${formData.type}\n- Identifier: ${formData.initials}\n- Grade: ${formData.grade}\n- Goals/Focus: ${formData.goals}\n\nPlease output the response in well-formatted Markdown.`;
     }
 
-    const fetchWithRetry = async (modelName, payload, retries = 1) => {
-      console.log(`Sending prompt to Gemini (${modelName})...`);
-      let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      // If model is overloaded (503) and we have retries left, wait and retry
-      if (!res.ok && res.status === 503 && retries > 0) {
-        console.log(`${modelName} is overloaded (503). Waiting 1.5s and retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        return fetchWithRetry(modelName, payload, retries - 1);
+    const fetchWithFallback = async (models, payload) => {
+      for (const modelName of models) {
+        console.log(`Sending prompt to Gemini (${modelName})...`);
+        let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          return res;
+        }
+        
+        // If the model is overloaded, rate-limited, or completely disabled/not found
+        if (res.status === 503 || res.status === 429 || res.status === 404) {
+          console.log(`${modelName} failed (${res.status}). Switching to next fallback model...`);
+          continue;
+        }
+        
+        // For other errors (e.g. 400 Bad Request syntax), return immediately to show the error
+        return res;
       }
-      return res;
+      throw new Error("All AI models are currently experiencing extremely high demand (503). Please wait 30 seconds and try again.");
     };
 
     const payload = {
@@ -90,7 +98,8 @@ serve(async (req) => {
       }
     };
 
-    const response = await fetchWithRetry('gemini-3.5-flash', payload);
+    const modelQueue = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash'];
+    const response = await fetchWithFallback(modelQueue, payload);
 
     if (!response.ok) {
       const errorText = await response.text();
