@@ -17,6 +17,27 @@
   
   --card-bg: #1e293b;
   --card-border: rgba(255, 255, 255, 0.05);
+
+  /* Override Tailwind v4 default colors dynamically for flawless dark mode */
+  --color-white: #1e293b;
+  --color-gray-50: #0f172a;
+  --color-gray-100: #1e293b;
+  --color-gray-200: #334155;
+  --color-gray-300: #475569;
+  --color-gray-400: #64748b;
+  --color-gray-500: #94a3b8;
+  --color-gray-600: #cbd5e1;
+  --color-gray-700: #e2e8f0;
+  --color-gray-800: #f1f5f9;
+  --color-gray-900: #f8fafc;
+  
+  /* Mute the bright accent backgrounds in dark mode */
+  --color-orange-50: rgba(234, 88, 12, 0.1);
+  --color-blue-50: rgba(37, 99, 235, 0.1);
+  --color-purple-50: rgba(147, 51, 234, 0.1);
+  --color-green-50: rgba(22, 163, 74, 0.1);
+  --color-rose-50: rgba(225, 29, 72, 0.1);
+  --color-teal-50: rgba(13, 148, 136, 0.1);
 }
 
 @theme {
@@ -29,6 +50,8 @@
   --font-heading: "Nunito", sans-serif;
   --font-body: "Inter", sans-serif;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   body {
@@ -43,21 +66,6 @@
     font-family: var(--font-heading);
     color: var(--color-textColor);
   }
-
-  /* Global Dark Mode Overrides for hardcoded utility classes */
-  html.dark .bg-white { background-color: var(--card-bg) !important; }
-  html.dark .bg-gray-50 { background-color: var(--alt-bg-color) !important; }
-  html.dark .bg-gray-100 { background-color: #334155 !important; }
-  
-  html.dark .text-gray-900 { color: #f8fafc !important; }
-  html.dark .text-gray-800 { color: #f1f5f9 !important; }
-  html.dark .text-gray-700, 
-  html.dark .text-gray-600, 
-  html.dark .text-gray-500 { color: #94a3b8 !important; }
-  
-  html.dark .border-gray-100, 
-  html.dark .border-gray-200, 
-  html.dark .border-gray-300 { border-color: rgba(255,255,255,0.1) !important; }
 }
 
 html, body {
