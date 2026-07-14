@@ -70,23 +70,28 @@ const Features = () => {
         </FadeIn>
 
         {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, i) => {
             const Icon = feature.icon;
             return (
               <FadeIn key={i} delay={i * 60} direction="up">
                 <div
-                  className="bg-white rounded-xl p-6 border border-gray-200 hover:border-gray-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] transition-all duration-200 cursor-pointer group h-full flex flex-col"
+                  className="relative group h-full flex flex-col rounded-2xl bg-white dark:bg-slate-800/80 p-6 border border-gray-200/60 dark:border-white/10 hover:border-primary/30 transition-all duration-300 cursor-pointer overflow-hidden z-10"
                   onClick={() => handleTryTool(feature.toolType)}
                 >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${feature.accent}`}>
-                    <Icon size={20} />
+                  {/* Hover Glow Behind Card */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0" />
+                  
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${feature.accent} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon size={24} />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">{feature.label}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed flex-1">{feature.description}</p>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-primary group-hover:gap-3 transition-all">
+                      Try it out <ArrowRight size={16} />
+                    </span>
                   </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2">{feature.label}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed flex-1">{feature.description}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary group-hover:gap-2 transition-all">
-                    Try it <ArrowRight size={14} />
-                  </span>
                 </div>
               </FadeIn>
             );
