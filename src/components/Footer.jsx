@@ -45,10 +45,12 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-bold font-heading mb-4">Legal</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">FERPA Compliance</a></li>
-              <li><a href="#" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">HIPAA Compliance</a></li>
+              <li><Link to="/privacy-policy" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Privacy Policy</Link></li>
+              <li><Link to="/terms-conditions" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Terms & Conditions</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Refund & Cancellation</Link></li>
+              <li><Link to="/shipping-policy" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Shipping & Delivery</Link></li>
+              <li><Link to="/cookie-policy" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Cookie Policy</Link></li>
+              <li><Link to="/disclaimer" className="hover:text-primary-300 transition-all duration-300 ease-linear-curve hover:translate-x-1 inline-block">Disclaimer</Link></li>
             </ul>
           </div>
           
