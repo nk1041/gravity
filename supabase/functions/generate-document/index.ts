@@ -52,7 +52,51 @@ serve(async (req) => {
 
     let prompt = "";
     if (formData.type === 'iep') {
-      prompt = `Write an Individualized Education Program (IEP) draft based on the following details:\n- Student Initials: ${formData.initials}\n- Grade Level: ${formData.grade}\n- Primary Goals: ${formData.goals}\n- Selected Accommodations: \n  - Extended Time: ${formData.accommodations?.time ? 'Yes' : 'No'}\n  - Visual Schedules: ${formData.accommodations?.visual ? 'Yes' : 'No'}\n  - Frequent Breaks: ${formData.accommodations?.breaks ? 'Yes' : 'No'}\n  - Quiet Workspace: ${formData.accommodations?.quiet ? 'Yes' : 'No'}\n\nPlease output the response in well-formatted Markdown. Include standard IEP sections. Be professional, comprehensive, and specific to the provided details. Do not include any PII other than the initials provided.`;
+      prompt = `Write an Individualized Education Plan (IEP) draft based on the following details:
+- Student Name/Initials: ${formData.initials}
+- Grade Level / Age: ${formData.grade}
+- Gender: ${formData.gender || 'Not specified'}
+- Type of Special Need (RPwD Act): ${formData.category}
+- Primary Goals / Needs: ${formData.goals}
+- Parent/Teacher Selected Accommodations: Extended Time: ${formData.accommodations?.time ? 'Yes' : 'No'}, Visual Schedules: ${formData.accommodations?.visual ? 'Yes' : 'No'}, Frequent Breaks: ${formData.accommodations?.breaks ? 'Yes' : 'No'}, Quiet Workspace: ${formData.accommodations?.quiet ? 'Yes' : 'No'}.
+
+IMPORTANT INSTRUCTION: You MUST structure the output EXACTLY matching the standard Indian school IEP format below, using markdown tables where appropriate. Infer and generate realistic, professional data for all the fields based on the student's profile. DO NOT leave fields blank; synthesize appropriate responses.
+
+# Individualized Educational Plan
+
+### PART A
+Create a markdown table for Student Information including: Name, SD/ID (generate placeholder), Date of Birth (infer from grade), Sex, Father/Mother name (placeholder), Address (placeholder), Date of filling up of IEP (today), Class and section, Assistive device used.
+Create another markdown table for: 1. Type of special need, 2. Associated condition, 3. Mother tongue/language, 4. Referral to other services, 5. Annual goals, 6. Short term goals.
+
+### PART B
+**Relevant Assessment Data**
+Create a markdown table with columns: Information source, Date, Summary.
+
+**Student's area of strength and weaknesses**
+Create a markdown table with columns: Areas of strength, Areas of weaknesses.
+
+**Student Observation**
+Create a markdown table with columns: Observation Area (Preparedness, Concentration, Communication, Behaviour) and status (Needs continued support, Needs occasional support, No concern). Infer the status.
+
+**Learning Domains & Skills**
+List the following domains and indicate the student's status or needs (Language, Reading, Spelling, Handwriting, Comprehension, Numeracy, Work in class, Creative & Application of Knowledge, Motor skills, Self management skills, Interpersonal relation, Managing emotions, Problem solving, Self directed engaged learning).
+
+**Accommodation, Modification and Exemptions**
+List the required accommodations inferred from the profile (e.g., Exemption in third language, Extra time, Large font, Assistance in reading, Prompter, Classroom Accommodation, Visual cues, scribe, Weekly homebound program, Modified question paper, Modified co-curricular activities, Assistive device, Disability friendly toilets/lifts, Signage, ramps railing, Accessibility to school facilities, Flexibility in subjects).
+
+**Preferred learning style:** [Infer]
+**Behavioural Objectives:** [Generate based on goals]
+**Teaching Strategies:** [Generate based on profile]
+
+### PART C
+**Progress in Curricular and co-curricular activities:** [Generate realistic expectation/current status]
+**Suggestions from Parents:** [Generate realistic suggestion]
+**Recommendations:** [Generate professional recommendations]
+
+**Signatures:**
+Provide a signature block (Principal, Class teacher, Parent).
+
+Ensure the terminology aligns with the RPwD Act (e.g., use "Autism Spectrum Disorder (ASD)" instead of "Autism"). Be highly professional and format it cleanly in Markdown.`;
     } else if (formData.type === 'lp') {
       prompt = `Write a Lesson Plan based on the following details:\n- Topic/Subject: ${formData.subject || formData.initials}\n- Grade Level: ${formData.grade}\n- Learning Objectives: ${formData.goals}\n- Selected Accommodations: \n  - Extended Time: ${formData.accommodations?.time ? 'Yes' : 'No'}\n  - Visual Schedules: ${formData.accommodations?.visual ? 'Yes' : 'No'}\n  - Frequent Breaks: ${formData.accommodations?.breaks ? 'Yes' : 'No'}\n  - Quiet Workspace: ${formData.accommodations?.quiet ? 'Yes' : 'No'}\n\nPlease output the response in well-formatted Markdown.`;
     } else {

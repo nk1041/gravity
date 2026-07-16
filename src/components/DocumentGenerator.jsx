@@ -16,6 +16,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
   const [formData, setFormData] = useState({
     initials: '',
     grade: '',
+    gender: '',
     category: '',
     type: defaultType,
     goals: '',
@@ -109,7 +110,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
   // Helper to generate dynamic content based on selections
   const getDocumentTitle = () => {
     switch (formData.type) {
-      case 'iep': return 'Individualized Education Program (IEP)';
+      case 'iep': return 'Individualized Education Plan (IEP)';
       case 'itp': return 'Individualized Transition Plan (ITP)';
       case 'lp': return 'Differentiated Lesson Plan';
       default: return 'Document Preview';
@@ -164,6 +165,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
       doc.setFontSize(10);
       
       // Clean basic markdown for PDF text output (remove bold/italics markers)
+      // Note: A true table rendering in PDF would require jspdf-autotable, but this works as a baseline text export.
       const cleanText = generatedContent.replace(/[*_]/g, '');
       const paragraphs = cleanText.split('\n').filter(p => p.trim() !== '');
       
@@ -257,14 +259,14 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {formData.type !== 'lp' ? (
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Student Initials</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Student Name/Initials</label>
                         <input 
                           required 
                           name="initials"
                           value={formData.initials}
                           onChange={handleInputChange}
                           type="text" 
-                          placeholder="e.g. J.D." 
+                          placeholder="e.g. Rahul S." 
                           className="w-full px-4 py-3 rounded-xl border border-gray-200/80 focus:ring-4 focus:ring-primary/15 focus:border-primary outline-none transition-all duration-300 ease-linear-curve hover:border-primary/40 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.02)]" 
                         />
                       </div>
@@ -287,7 +289,7 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Grade Level</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Grade / Age</label>
                       <select 
                         required 
                         name="grade"
@@ -296,33 +298,58 @@ const DocumentGenerator = ({ defaultType = 'iep' }) => {
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white"
                       >
                         <option value="">Select Grade</option>
-                        <option value="k">Kindergarten</option>
-                        <option value="1">1st Grade</option>
-                        <option value="3">3rd Grade</option>
-                        <option value="6-8">Middle School</option>
-                        <option value="9-12">High School</option>
+                        <option value="k">Kindergarten / Age 5</option>
+                        <option value="1">1st Grade / Age 6</option>
+                        <option value="2">2nd Grade / Age 7</option>
+                        <option value="3">3rd Grade / Age 8</option>
+                        <option value="4">4th Grade / Age 9</option>
+                        <option value="5">5th Grade / Age 10</option>
+                        <option value="6-8">Middle School (Ages 11-14)</option>
+                        <option value="9-12">High School (Ages 14-18)</option>
                       </select>
                     </div>
                   </div>
 
-                  {formData.type === 'iep' && (
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-1">Disability Category</label>
-                      <select 
-                        required 
-                        name="category"
-                        value={formData.category}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white"
-                      >
-                        <option value="">Select Category</option>
-                        <option value="autism">Autism</option>
-                        <option value="sld">Specific Learning Disability</option>
-                        <option value="sli">Speech/Language Impairment</option>
-                        <option value="edd">Emotional Disturbance</option>
-                      </select>
-                    </div>
-                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {formData.type === 'iep' && (
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Gender</label>
+                        <select 
+                          required 
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white"
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    )}
+                    {formData.type === 'iep' && (
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-1">Special Need (RPwD Act)</label>
+                        <select 
+                          required 
+                          name="category"
+                          value={formData.category}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-white truncate"
+                        >
+                          <option value="">Select Category</option>
+                          <option value="Autism Spectrum Disorder (ASD)">Autism Spectrum Disorder (ASD)</option>
+                          <option value="Specific Learning Disability">Specific Learning Disability</option>
+                          <option value="Intellectual Disability">Intellectual Disability</option>
+                          <option value="Speech and Language Disability">Speech and Language Disability</option>
+                          <option value="Hearing Impairment">Hearing Impairment</option>
+                          <option value="Visual Impairment">Visual Impairment</option>
+                          <option value="Multiple Disabilities">Multiple Disabilities</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
 
                   {formData.type === 'itp' && (
                     <div>
