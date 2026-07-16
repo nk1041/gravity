@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Exclude private or unhelpful paths if any (e.g., auth pages, internal dashboard)
+Disallow: /dashboard/
+Disallow: /dashboard/*
+
+Sitemap: https://simplyabled.vercel.app/sitemap.xml
