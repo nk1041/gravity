@@ -5,4 +5,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /dashboard/*
 
-Sitemap: https://simplyabled.vercel.app/sitemap.xml
+Sitemap: https://simplyabled.com/sitemap.xml
