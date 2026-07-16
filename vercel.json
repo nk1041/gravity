@@ -1,4 +1,43 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/contactus",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/aboutus",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy-policy",
+      "permanent": true
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms-conditions",
+      "permanent": true
+    },
+    {
+      "source": "/shop(.*)",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/blog(.*)",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/web(.*)",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
