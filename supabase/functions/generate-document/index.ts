@@ -52,55 +52,87 @@ serve(async (req) => {
 
     let prompt = "";
     if (formData.type === 'iep') {
-      prompt = `Write an Individualized Education Plan (IEP) draft based on the following details:
-- Student Name/Initials: ${formData.initials}
-- Grade Level / Age: ${formData.grade}
-- Gender: ${formData.gender || 'Not specified'}
-- Type of Special Need (RPwD Act): ${formData.category}
-- Primary Goals / Needs: ${formData.goals}
-- Parent/Teacher Selected Accommodations: Extended Time: ${formData.accommodations?.time ? 'Yes' : 'No'}, Visual Schedules: ${formData.accommodations?.visual ? 'Yes' : 'No'}, Frequent Breaks: ${formData.accommodations?.breaks ? 'Yes' : 'No'}, Quiet Workspace: ${formData.accommodations?.quiet ? 'Yes' : 'No'}.
+      const adaptiveAnswersString = Object.entries(formData.adaptiveAnswers || {})
+        .map(([key, value]) => `- ${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
+        .join("\n");
+      
+      const strengthsStr = (formData.strengths || []).join(", ") || "None specified";
+      const needsStr = (formData.needs || []).join(", ") || "None specified";
+      const accStr = (formData.accommodations || []).join(", ") || "None specified";
 
-IMPORTANT INSTRUCTION: You MUST structure the output EXACTLY matching the standard Indian school IEP format below, using markdown tables where appropriate. Infer and generate realistic, professional data for all the fields based on the student's profile. DO NOT leave fields blank; synthesize appropriate responses.
+      prompt = `Write a comprehensive Individualized Education Plan (IEP) draft for an Indian school setting based on the following detailed student interview data:
+
+**Student Information:**
+- Name: ${formData.studentName}
+- Grade/Age: ${formData.grade}
+- Gender: ${formData.gender || 'Not specified'}
+- Primary Disability (RPwD Act): ${formData.category}
+
+**Adaptive Profile Responses:**
+${adaptiveAnswersString || "No adaptive data provided."}
+
+**Strengths:** ${strengthsStr}
+**Areas Requiring Support:** ${needsStr}
+**Classroom Accommodations Requested:** ${accStr}
+
+**Teacher Observations/Notes:**
+${formData.observations || "None provided."}
+
+IMPORTANT INSTRUCTION: You MUST structure the output EXACTLY matching the standard Indian school IEP format using markdown tables where appropriate. You MUST use the provided data. Do not invent facts, but synthesize and infer professional recommendations, teaching strategies, and goals based on the specific adaptive profile and disability selected. If data is sparse, generate evidence-based recommendations clearly marked as suggestions.
 
 # Individualized Educational Plan
 
-### PART A
-Create a markdown table for Student Information including: Name, SD/ID (generate placeholder), Date of Birth (infer from grade), Sex, Father/Mother name (placeholder), Address (placeholder), Date of filling up of IEP (today), Class and section, Assistive device used.
-Create another markdown table for: 1. Type of special need, 2. Associated condition, 3. Mother tongue/language, 4. Referral to other services, 5. Annual goals, 6. Short term goals.
+### PART A: Student Profile
+Create a markdown table for Student Information including: Name, SD/ID (generate placeholder), Date of Birth (infer from grade), Sex, Father/Mother name (placeholder), Address (placeholder), Date of IEP (today), Class and section.
+Create another markdown table for: 1. Type of special need, 2. Associated condition, 3. Mother tongue/language, 4. Referral to other services.
 
-### PART B
-**Relevant Assessment Data**
-Create a markdown table with columns: Information source, Date, Summary.
+### PART B: Performance & Profile
+**Present Level of Performance**
+Summarize the current functioning based on the adaptive profile responses provided.
 
-**Student's area of strength and weaknesses**
-Create a markdown table with columns: Areas of strength, Areas of weaknesses.
+**Academic & Functional Performance**
+Detail the academic (reading, writing, math) and functional (adaptive, social, communication) status.
 
-**Student Observation**
-Create a markdown table with columns: Observation Area (Preparedness, Concentration, Communication, Behaviour) and status (Needs continued support, Needs occasional support, No concern). Infer the status.
+**Student Strengths**
+List strengths in a markdown table or bullet points based on the inputs.
 
-**Learning Domains & Skills**
-List the following domains and indicate the student's status or needs (Language, Reading, Spelling, Handwriting, Comprehension, Numeracy, Work in class, Creative & Application of Knowledge, Motor skills, Self management skills, Interpersonal relation, Managing emotions, Problem solving, Self directed engaged learning).
+**Areas of Need**
+List the areas requiring support.
 
-**Accommodation, Modification and Exemptions**
-List the required accommodations inferred from the profile (e.g., Exemption in third language, Extra time, Large font, Assistance in reading, Prompter, Classroom Accommodation, Visual cues, scribe, Weekly homebound program, Modified question paper, Modified co-curricular activities, Assistive device, Disability friendly toilets/lifts, Signage, ramps railing, Accessibility to school facilities, Flexibility in subjects).
+### PART C: Goals & Strategies
+**Annual Goals**
+Formulate 2-3 SMART annual goals targeting the primary areas of need.
 
-**Preferred learning style:** [Infer]
-**Behavioural Objectives:** [Generate based on goals]
-**Teaching Strategies:** [Generate based on profile]
+**Short-term Goals**
+Break down each annual goal into 2 short-term objectives.
 
-### PART C
-**Progress in Curricular and co-curricular activities:** [Generate realistic expectation/current status]
-**Suggestions from Parents:** [Generate realistic suggestion]
-**Recommendations:** [Generate professional recommendations]
+**Classroom Accommodations**
+List the requested accommodations and infer any additional necessary physical/instructional modifications.
+
+**Teaching Strategies**
+Provide specific, evidence-based teaching strategies tailored to the student's disability and learning style.
+
+**Behaviour Support**
+Outline strategies for behaviour regulation and social integration if applicable.
+
+### PART D: Recommendations & Review
+**Parent Recommendations**
+Provide actionable advice for parents to support the student at home.
+
+**Progress Monitoring**
+Describe how the student's progress on goals will be measured (e.g., weekly data collection, teacher observation).
+
+**Review Schedule**
+State the timeline for reviewing this IEP (e.g., quarterly review dates).
 
 **Signatures:**
-Provide a signature block (Principal, Class teacher, Parent).
+Provide a signature block (Principal, Special Educator, Class Teacher, Parent).
 
-Ensure the terminology aligns with the RPwD Act (e.g., use "Autism Spectrum Disorder (ASD)" instead of "Autism"). Be highly professional and format it cleanly in Markdown.`;
+Ensure all terminology is highly professional, respectful, and aligns with the RPwD Act. Format it cleanly in Markdown.`;
     } else if (formData.type === 'lp') {
-      prompt = `Write a Lesson Plan based on the following details:\n- Topic/Subject: ${formData.subject || formData.initials}\n- Grade Level: ${formData.grade}\n- Learning Objectives: ${formData.goals}\n- Selected Accommodations: \n  - Extended Time: ${formData.accommodations?.time ? 'Yes' : 'No'}\n  - Visual Schedules: ${formData.accommodations?.visual ? 'Yes' : 'No'}\n  - Frequent Breaks: ${formData.accommodations?.breaks ? 'Yes' : 'No'}\n  - Quiet Workspace: ${formData.accommodations?.quiet ? 'Yes' : 'No'}\n\nPlease output the response in well-formatted Markdown.`;
+      prompt = `Write a Lesson Plan based on the following details:\n- Topic/Subject: ${formData.studentName}\n- Grade Level: ${formData.grade}\n- Learning Objectives: ${formData.observations}\n\nPlease output the response in well-formatted Markdown.`;
     } else {
-      prompt = `Write a detailed educational document based on:\n- Type: ${formData.type}\n- Identifier: ${formData.initials}\n- Grade: ${formData.grade}\n- Goals/Focus: ${formData.goals}\n\nPlease output the response in well-formatted Markdown.`;
+      prompt = `Write a detailed educational document based on:\n- Type: ${formData.type}\n- Identifier: ${formData.studentName}\n- Grade: ${formData.grade}\n- Notes: ${formData.observations}\n\nPlease output the response in well-formatted Markdown.`;
     }
 
     const fetchWithFallback = async (models, payload) => {
