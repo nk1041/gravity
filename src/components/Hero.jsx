@@ -190,6 +190,23 @@ const Hero = () => {
           </div>
 
         </div>
+
+        {/* Product Hunt Badge */}
+        <FadeIn delay={400} direction="up">
+          <div className="mt-24 pt-12 border-t border-gray-100 flex flex-col items-center justify-center gap-2 text-center w-full">
+            <h3 className="text-lg sm:text-xl font-bold font-heading text-gray-900">Featured on Product Hunt</h3>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4 max-w-md mx-auto">Trusted by educators worldwide and featured on Product Hunt.</p>
+            <a href="https://www.producthunt.com/products/simplyabled?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-simplyabled" target="_blank" rel="noopener noreferrer">
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1199746&theme=light&t=1784547566793"
+                alt="SimplyAbled - AI-powered documentation for Special Educators in minutes. | Product Hunt"
+                width="250"
+                height="54"
+                className="transition-transform duration-300 hover:scale-105"
+              />
+            </a>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
