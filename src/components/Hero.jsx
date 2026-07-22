@@ -198,7 +198,7 @@ const Hero = () => {
             <p className="text-xs sm:text-sm text-gray-500 mb-4 max-w-md mx-auto">Trusted by educators worldwide and featured on Product Hunt.</p>
             <a href="https://www.producthunt.com/products/simplyabled?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-simplyabled" target="_blank" rel="noopener noreferrer">
               <img
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1199746&theme=light&t=1784547566793"
+                src="/ph-badge.svg"
                 alt="SimplyAbled - AI-powered documentation for Special Educators in minutes. | Product Hunt"
                 width="250"
                 height="54"
